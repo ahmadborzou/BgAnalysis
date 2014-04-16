@@ -1,0 +1,12 @@
+#!/bin/bash
+echo -n "your file's name? ";
+read file;
+echo "Splitting $file, Please wait ..."
+
+split --lines=10 -d $file;
+
+for tmp in ls x*
+do 
+mv $tmp $file_$tmp 
+done;
+

@@ -1,0 +1,253 @@
+# units are in (pb)
+#============================================================================#
+#--------------------   Delphes-3.0.9.1  8TEV Inclusive   -------------------#
+#============================================================================#
+TT_8TEV                  234                 0.001
+ZJETS_8TEV_HT1           381.2               0.001            ## Z->vv + jets ( 50 < HT < 100 GeV)
+ZJETS_8TEV_HT2           160.3               0.001            ## Z->vv + jets (100 < HT < 200 GeV )
+ZJETS_8TEV_HT3           41.49               0.001            ## Z->vv + jets (200 < HT < 400 GeV )
+ZJETS_8TEV_HT4           5.274               0.001            ## Z->vv + jets (400 < HT < inf GeV )
+W1Jet_8TEV               6662.78             0.001            ##
+W2Jet_8TEV               2159.24             0.001            ##
+W3Jet_8TEV               640.37              0.001            ##
+W4Jet_8TEV               264.0               0.001            ##
+
+#============================================================================#
+#--------------------   Delphes-3.0.9.1 14TEV Inclusive   -------------------#
+#============================================================================#
+Wino100_14TeV            0.046               0.00001          #99% Wino at 100 GeV at 14TeV
+Wino200_14TeV            0.01147             0.00001          #99% Wino at 200 GeV at 14TeV
+Wino500_14TeV            0.00045             0.00001          #99% Wino at 500 GeV at 14TeV
+WJETS_13TEV              63066               1075.5           #Inclusive W(lv) + jets at 14TeV
+ZJETS_13TEV              12930               213              #Inclusive Z(vv) + jets at 14TeV
+TTBAR_13TEV              882.29              117.38           #Inclusive TTbar + jets at 14TeV
+
+#============================================================================#
+#----------------------   Delphes-3.0.9.1 14TEV HTBin   ---------------------#
+#============================================================================#
+B_14TEV_HT1              200944.68129        25.15587         #Boson (photon, W, Z) + Jets
+BJ_14TEV_HT1             34409.92339         10.65700         #Boson (photon, W, Z) + Jets, 0 < HT (GeV) < 300
+BJ_14TEV_HT2             2642.85309          1.13482          #Boson (photon, W, Z) + Jets, 300 < HT (GeV) < 600
+BJ_14TEV_HT3             294.12311           0.13649          #Boson (photon, W, Z) + Jets, 600 < HT (GeV) < 1100
+BJ_14TEV_HT4             25.95000            0.01344          #Boson (photon, W, Z) + Jets, 1100 < HT (GeV) < 1800
+BJ_14TEV_HT5             2.42111             0.00129          #Boson (photon, W, Z) + Jets, 1800 < HT (GeV) < 2700
+BJ_14TEV_HT6             0.22690             0.00016          #Boson (photon, W, Z) + Jets, 2700 < HT (GeV) < 3700
+BJ_14TEV_HT7             0.02767             0.00001          #Boson (photon, W, Z) + Jets, 3700 < HT (GeV) < 100000
+BJJ_14TEV_HT1            86.45604            0.02382          #Boson (photon, W, Z, h) + >= 2Jets, 0 < HT (GeV) < 700
+BJJ_14TEV_HT2            4.34869             0.00166          #Boson (photon, W, Z, h) + >= 2Jets, 700 < HT (GeV) < 14000
+BJJ_14TEV_HT3            0.32465             0.00015          #Boson (photon, W, Z, h) + >= 2Jets, 1400 < HT (GeV) < 2300
+BJJ_14TEV_HT4            0.03032             0.00004          #Boson (photon, W, Z, h) + >= 2Jets, 2300 < HT (GeV) < 3400
+BJJ_14TEV_HT5            0.00313             0.00001          #Boson (photon, W, Z, h) + >= 2Jets, 2300 < HT (GeV) < 3400
+BB_14TEV_HT1             249.97710           0.05919          #Diboson (photon, W, Z) + Jets, 0 < HT (GeV) < 300
+BB_14TEV_HT2             35.23062            0.01132          #Diboson (photon, W, Z) + Jets, 300 < HT (GeV) < 700
+BB_14TEV_HT3             4.13743             0.00150          #Diboson (photon, W, Z) + Jets, 700 < HT (GeV) < 1300
+BB_14TEV_HT4             0.41702             0.00019          #Diboson (photon, W, Z) + Jets, 1300 < HT (GeV) < 2100
+BB_14TEV_HT5             0.04770             0.00005          #Diboson (photon, W, Z) + Jets, 2100 GeV < HT (GeV) < 100000
+BBB_14TEV_HT1            2.57304             0.00071          #Triboson (photon, W, Z) + Jets, 0 < HT (GeV) < 600
+BBB_14TEV_HT2            0.14935             0.00005          #Triboson (photon, W, Z) + Jets, 600 < HT (GeV) < 1300
+BBB_14TEV_HT3            0.01274             0.00001          #Triboson (photon, W, Z) + Jets, 1300 < HT (GeV) < 100000
+H_14TEV_HT1              21.55990            0.00696          #Higgs + Jets, 0 < HT (GeV) < 300
+H_14TEV_HT2              1.11282             0.00068          #Higgs + Jets, 300 < HT (GeV) < 800
+H_14TEV_HT3              0.09188             0.00006          #Higgs + Jets, 800 < HT (GeV) < 1500
+H_14TEV_HT4              0.01009             0.00001          #Higgs + Jets, 1500 < HT (GeV) < 100000
+LL_14TEV_HT1             1341.36923          0.17120          #dileptons + jets, mll > 20 GeV, 0 < HT (GeV) < 100
+LL_14TEV_HT2             156.29534           0.04388          #dileptons + jets, mll > 20 GeV, 100 < HT (GeV) < 200
+LL_14TEV_HT3             42.40132            0.01301          #dileptons + jets, mll > 20 GeV, 200 < HT (GeV) < 500
+LL_14TEV_HT4             2.84373             0.00228          #dileptons + jets, mll > 20 GeV, 500 < HT (GeV) < 900
+LL_14TEV_HT5             0.20914             0.00011          #dileptons + jets, mll > 20 GeV, 900 < HT (GeV) < 1400
+LL_14TEV_HT6             0.02891             0.00004          #dileptons + jets, mll > 20 GeV, 1400 < HT (GeV) < 100000
+LLB_14TEV_HT1            2.97380             0.00084          #dileptons + boson + jets, mll > 20 GeV, 0 < HT (GeV) < 400
+LLB_14TEV_HT2            0.22854             0.00006          #dileptons + boson + jets, mll > 20 GeV, 400 < HT (GeV) < 900
+LLB_14TEV_HT3            0.02080             0.00001          #dileptons + boson + jets, mll > 20 GeV, 900 < HT (GeV) < 100000
+TB_14TEV_HT1             63.88923            0.01952          #single top + boson + jets, 0 < HT (GeV) < 500
+TB_14TEV_HT2             7.12172             0.00278          #single top + boson + jets, 500 < HT (GeV) < 900
+TB_14TEV_HT3             0.98030             0.00034          #single top + boson + jets, 900 < HT (GeV) < 1500
+TB_14TEV_HT4             0.08391             0.00004          #single top + boson + jets, 1500 < HT (GeV) < 2200
+TB_14TEV_HT5             0.00953             0.00000          #single top + boson + jets, 2200 < HT (GeV) < 100000
+TJ_14TEV_HT1             109.73602           0.02046          #single top + jets, 0 < HT (GeV) < 500
+TJ_14TEV_HT2             5.99325             0.00225          #single top + jets, 500 < HT (GeV) < 1000
+TJ_14TEV_HT3             0.37680             0.00016          #single top + jets, 1000 < HT (GeV) < 1600
+TJ_14TEV_HT4             0.03462             0.00002          #single top + jets, 1600 < HT (GeV) < 2400
+TJ_14TEV_HT5             0.00312             0.00000          #single top + jets, 2400 < HT (GeV) < 100000
+TT_14TEV_HT1             530.89358           0.15615          #ttbar + jets, 0 < HT (GeV) < 600
+TT_14TEV_HT2             42.55351            0.01367          #ttbar + jets, 600 < HT (GeV) < 1100
+TT_14TEV_HT3             4.48209             0.00164          #ttbar + jets, 1100 < HT (GeV) < 1700
+TT_14TEV_HT4             0.52795             0.00019          #ttbar + jets, 1700 < HT (GeV) < 2500
+TT_14TEV_HT5             0.05449             0.00002          #ttbar + jets, 2500 < HT (GeV) < 100000
+
+#============================================================================#
+#----------------------   Delphes-3.0.9.1 33TEV HTBin   ---------------------#
+#============================================================================#
+B_33TEV_HT1              537755.09879        0.001            #B-4p-0-1_33TEV              
+BJ_33TEV_HT1             129824.79383        0.001            #Bj-4p-0-400_33TEV           
+BJ_33TEV_HT2             6598.37529          0.001            #Bj-4p-400-1000_33TEV        
+BJ_33TEV_HT3             325.55814           0.001            #Bj-4p-1000-1800_33TEV       
+BJ_33TEV_HT4             32.45249            0.001            #Bj-4p-1800-3000_33TEV       
+BJ_33TEV_HT5             3.16778             0.001            #Bj-4p-3000-4600_33TEV       
+BJ_33TEV_HT6             0.32737             0.001            #Bj-4p-4600-6600_33TEV       
+BJ_33TEV_HT7             0.04045             0.001            #Bj-4p-6600-100000_33TEV     
+BJJ_33TEV_HT1            302.55913           0.001            #Bjj-vbf-4p-0-800_33TEV      
+BJJ_33TEV_HT2            1.73825             0.001            #Bjj-vbf-4p-1600-3000_33TEV  
+BJJ_33TEV_HT3            0.13606             0.001            #Bjj-vbf-4p-3000-4800_33TEV  
+BJJ_33TEV_HT4            0.01623             0.001            #Bjj-vbf-4p-4800-100000_33TEV
+BJJ_33TEV_HT5            16.41152            0.001            #Bjj-vbf-4p-800-1600_33TEV   
+BB_33TEV_HT1             776.00399           0.001            #BB-4p-0-400_33TEV           
+BB_33TEV_HT2             106.85023           0.001            #BB-4p-400-1000_33TEV        
+BB_33TEV_HT3             10.16835            0.001            #BB-4p-1000-2000_33TEV       
+BB_33TEV_HT4             0.86136             0.001            #BB-4p-2000-3400_33TEV       
+BB_33TEV_HT5             0.09507             0.001            #BB-4p-3400-100000_33TEV     
+BBB_33TEV_HT1            8.68026             0.001            #BBB-4p-0-800_33TEV          
+BBB_33TEV_HT2            0.44927             0.001            #BBB-4p-800-2000_33TEV       
+BBB_33TEV_HT3            0.02699             0.001            #BBB-4p-2000-3600_33TEV      
+BBB_33TEV_HT4            0.00246             0.001            #BBB-4p-3600-100000_33TEV    
+H_33TEV_HT1              96.32472            0.001            #H-4p-0-400_33TEV            
+H_33TEV_HT2              5.83112             0.001            #H-4p-400-1200_33TEV         
+H_33TEV_HT3              0.42712             0.001            #H-4p-1200-2400_33TEV        
+H_33TEV_HT4              0.04353             0.001            #H-4p-2400-4200_33TEV        
+H_33TEV_HT5              0.00458             0.001            #H-4p-4200-100000_33TEV      
+LL_33TEV_HT1             3060.08132          0.001            #LL-4p-0-200_33TEV           
+LL_33TEV_HT2             139.42418           0.001            #LL-4p-200-600_33TEV         
+LL_33TEV_HT3             6.46065             0.001            #LL-4p-600-1200_33TEV        
+LL_33TEV_HT4             0.24278             0.001            #LL-4p-1200-1800_33TEV       
+LL_33TEV_HT5             0.06880             0.001            #LL-4p-1800-100000_33TEV     
+LLB_33TEV_HT1            8.19004             0.001            #LLB-4p-0-800_33TEV          
+LLB_33TEV_HT2            0.16401             0.001            #LLB-4p-800-2000_33TEV       
+LLB_33TEV_HT3            0.00722             0.001            #LLB-4p-2000-100000_33TEV    
+TB_33TEV_HT1             432.35695           0.001            #tB-4p-0-600_33TEV           
+TB_33TEV_HT2             53.97997            0.001            #tB-4p-600-1200_33TEV        
+TB_33TEV_HT3             5.60692             0.001            #tB-4p-1200-2000_33TEV       
+TB_33TEV_HT4             0.62643             0.001            #tB-4p-2000-3200_33TEV       
+TB_33TEV_HT5             0.05937             0.001            #tB-4p-3200-100000_33TEV     
+TJ_33TEV_HT1             493.50469           0.001            #tj-4p-0-600_33TEV           
+TJ_33TEV_HT2             23.51848            0.001            #tj-4p-600-1200_33TEV        
+TJ_33TEV_HT3             1.97369             0.001            #tj-4p-1200-2200_33TEV       
+TJ_33TEV_HT4             0.13199             0.001            #tj-4p-2200-3600_33TEV       
+TJ_33TEV_HT5             0.01099             0.001            #tj-4p-3600-100000_33TEV     
+TT_33TEV_HT1             3438.70635          0.001            #tt-4p-0-600_33TEV           
+TT_33TEV_HT2             505.82210           0.001            #tt-4p-600-1200_33TEV        
+TT_33TEV_HT3             61.81892            0.001            #tt-4p-1200-2000_33TEV       
+TT_33TEV_HT4             7.65752             0.001            #tt-4p-2000-3200_33TEV       
+TT_33TEV_HT5             0.72643             0.001            #tt-4p-3200-4800_33TEV       
+TT_33TEV_HT6             0.07147             0.001            #tt-4p-4800-100000_33TEV     
+
+#T1qqqq_14TEV_200  3.940e+03  0.001
+T1qqqq_14TEV_200  3.940e+03  0.001
+
+T1qqqq_14TEV_225  2.230e+03  0.001
+T1qqqq_14TEV_250  1.320e+03  0.001
+T1qqqq_14TEV_275  8.180e+02  0.001
+T1qqqq_14TEV_300  5.240e+02  0.001
+T1qqqq_14TEV_325  3.460e+02  0.001
+T1qqqq_14TEV_350  2.340e+02  0.001
+T1qqqq_14TEV_375  1.610e+02  0.001
+T1qqqq_14TEV_400  1.140e+02  0.001
+T1qqqq_14TEV_425  8.140e+01  0.001
+T1qqqq_14TEV_450  5.920e+01  0.001
+T1qqqq_14TEV_475  4.360e+01  0.001
+T1qqqq_14TEV_500  3.260e+01  0.001
+T1qqqq_14TEV_525  2.460e+01  0.001
+T1qqqq_14TEV_550  1.870e+01  0.001
+T1qqqq_14TEV_575  1.440e+01  0.001
+T1qqqq_14TEV_600  1.120e+01  0.001
+T1qqqq_14TEV_625  8.740e+00  0.001
+T1qqqq_14TEV_650  6.880e+00  0.001
+T1qqqq_14TEV_675  5.460e+00  0.001
+T1qqqq_14TEV_700  4.350e+00  0.001
+T1qqqq_14TEV_725  3.490e+00  0.001
+T1qqqq_14TEV_750  2.820e+00  0.001
+T1qqqq_14TEV_775  2.280e+00  0.001
+T1qqqq_14TEV_800  1.860e+00  0.001
+T1qqqq_14TEV_825  1.520e+00  0.001
+T1qqqq_14TEV_845  1.300e+00  0.001
+T1qqqq_14TEV_850  1.250e+00  0.001
+T1qqqq_14TEV_875  1.030e+00  0.001
+T1qqqq_14TEV_900  8.560e-01  0.001
+T1qqqq_14TEV_925  7.110e-01  0.001
+T1qqqq_14TEV_950  5.930e-01  0.001
+T1qqqq_14TEV_975  4.960e-01  0.001
+T1qqqq_14TEV_1000  4.160e-01  0.001
+T1qqqq_14TEV_1025  3.500e-01  0.001
+T1qqqq_14TEV_1050  2.950e-01  0.001
+T1qqqq_14TEV_1075  2.500e-01  0.001
+T1qqqq_14TEV_1100  2.120e-01  0.001
+T1qqqq_14TEV_1125  1.800e-01  0.001
+T1qqqq_14TEV_1145  1.580e-01  0.001
+T1qqqq_14TEV_1150  1.530e-01  0.001
+T1qqqq_14TEV_1175  1.310e-01  0.001
+T1qqqq_14TEV_1200  1.120e-01  0.001
+T1qqqq_14TEV_1225  9.600e-02  0.001
+T1qqqq_14TEV_1250  8.240e-02  0.001
+T1qqqq_14TEV_1275  7.090e-02  0.001
+T1qqqq_14TEV_1300  6.100e-02  0.001
+T1qqqq_14TEV_1325  5.270e-02  0.001
+T1qqqq_14TEV_1350  4.550e-02  0.001
+T1qqqq_14TEV_1375  3.940e-02  0.001
+T1qqqq_14TEV_1400  3.420e-02  0.001
+T1qqqq_14TEV_1425  2.960e-02  0.001
+T1qqqq_14TEV_1450  2.580e-02  0.001
+T1qqqq_14TEV_1475  2.240e-02  0.001
+T1qqqq_14TEV_1500  1.950e-02  0.001
+T1qqqq_14TEV_1525  1.700e-02  0.001
+T1qqqq_14TEV_1550  1.490e-02  0.001
+T1qqqq_14TEV_1575  1.300e-02  0.001
+T1qqqq_14TEV_1600  1.140e-02  0.001
+T1qqqq_14TEV_1625  9.960e-03  0.001
+T1qqqq_14TEV_1650  8.730e-03  0.001
+T1qqqq_14TEV_1675  7.660e-03  0.001
+T1qqqq_14TEV_1700  6.730e-03  0.001
+T1qqqq_14TEV_1725  5.920e-03  0.001
+T1qqqq_14TEV_1750  5.200e-03  0.001
+T1qqqq_14TEV_1775  4.580e-03  0.001
+T1qqqq_14TEV_1800  4.040e-03  0.001
+T1qqqq_14TEV_1825  3.560e-03  0.001
+T1qqqq_14TEV_1850  3.140e-03  0.001
+T1qqqq_14TEV_1875  2.770e-03  0.001
+T1qqqq_14TEV_1900  2.450e-03  0.001
+T1qqqq_14TEV_1925  2.160e-03  0.001
+T1qqqq_14TEV_1950  1.910e-03  0.001
+T1qqqq_14TEV_1975  1.690e-03  0.001
+T1qqqq_14TEV_2000  1.500e-03  0.001
+T1qqqq_14TEV_2025  1.330e-03  0.001
+T1qqqq_14TEV_2050  1.180e-03  0.001
+T1qqqq_14TEV_2075  1.040e-03  0.001
+T1qqqq_14TEV_2100  9.260e-04  0.001
+T1qqqq_14TEV_2125  8.220e-04  0.001
+T1qqqq_14TEV_2150  7.290e-04  0.001
+T1qqqq_14TEV_2175  6.480e-04  0.001
+T1qqqq_14TEV_2200  5.760e-04  0.001
+T1qqqq_14TEV_2225  5.110e-04  0.001
+T1qqqq_14TEV_2250  4.550e-04  0.001
+T1qqqq_14TEV_2275  4.040e-04  0.001
+T1qqqq_14TEV_2300  3.600e-04  0.001
+T1qqqq_14TEV_2325  3.200e-04  0.001
+T1qqqq_14TEV_2350  2.850e-04  0.001
+T1qqqq_14TEV_2375  2.530e-04  0.001
+T1qqqq_14TEV_2400  2.260e-04  0.001
+T1qqqq_14TEV_2425  2.010e-04  0.001
+T1qqqq_14TEV_2450  1.790e-04  0.001
+T1qqqq_14TEV_2475  1.590e-04  0.001
+T1qqqq_14TEV_2500  1.420e-04  0.001
+T1qqqq_14TEV_2525  1.270e-04  0.001
+T1qqqq_14TEV_2550  1.130e-04  0.001
+T1qqqq_14TEV_2575  1.000e-04  0.001
+T1qqqq_14TEV_2600  8.950e-05  0.001
+T1qqqq_14TEV_2625  7.980e-05  0.001
+T1qqqq_14TEV_2650  7.110e-05  0.001
+T1qqqq_14TEV_2675  6.340e-05  0.001
+T1qqqq_14TEV_2700  5.650e-05  0.001
+T1qqqq_14TEV_2725  5.040e-05  0.001
+T1qqqq_14TEV_2750  4.490e-05  0.001
+T1qqqq_14TEV_2775  4.000e-05  0.001
+T1qqqq_14TEV_2800  3.570e-05  0.001
+T1qqqq_14TEV_2825  3.180e-05  0.001
+T1qqqq_14TEV_2850  2.830e-05  0.001
+T1qqqq_14TEV_2875  2.530e-05  0.001
+T1qqqq_14TEV_2900  2.250e-05  0.001
+T1qqqq_14TEV_2925  2.000e-05  0.001
+T1qqqq_14TEV_2950  1.790e-05  0.001
+T1qqqq_14TEV_2975  1.590e-05  0.001
+T1qqqq_14TEV_3000  1.420e-05  0.001 
+
+#Ahmad
+NoextraJetT1qqqq_14TEV_2200  5.760e-04  0.001
+
