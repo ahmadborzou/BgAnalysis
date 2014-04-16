@@ -102,6 +102,7 @@ vector<vector<double> > vecjetvec, vecelecvec, vecmuvec;
 vector<double> jetvec, elecvec, muvec;
 vector<GenParticle*> GenParticlevec;
 vector<TH1D > vec;
+vector<Photon> photonvec;
 char TreeList[200], tempname[200];
 string pro, line;
 fstream file, input;
@@ -214,6 +215,59 @@ GenParticle * particle = (GenParticle*)branchParticle->At(i);
 GenParticlevec.push_back(particle);
 }//end of loop over "particles in history" 
 
+//////////////////loop over photons and load them to a vector
+for (int i = 0; i < branchPhoton->GetEntries(); ++i)
+  {
+    Photon* pho = (Photon*)branchPhoton->At(i);
+    if (fabs(pho->Eta) > 5)
+      continue;
+    photonvec.push_back(*pho);
+  }
+/////////////////end of loop over photons
+
+////loop over electrons (load them to a vector)
+elecvec.clear();
+vecelecvec.clear();
+for(int elecn=0; elecn <branchElectron->GetEntries();elecn++)
+{
+
+Electron* elec = (Electron*) branchElectron->At(elecn);
+///for HT we want events with all elecs pt > 10 and |eta|< 2.5
+if(elec->PT > 10 && elec->Eta < 2.5 && elec->Eta > (-2.5))
+{
+//the zeroth component is the tag of the elec/first:pt /second:phi/third:eta
+elecvec.push_back((double) elecn);
+elecvec.push_back(elec->PT);
+elecvec.push_back((double)elec->Phi);
+elecvec.push_back((double)elec->Eta);
+vecelecvec.push_back(elecvec);
+
+/// end of if over pt and eta for HT
+} 
+////end of loop over electrons
+}
+
+////loop over muons    (load them to a vector)
+muvec.clear();
+vecmuvec.clear();
+for(int mun=0; mun <branchMuon->GetEntries();mun++)
+{
+
+Muon* mu = (Muon*) branchMuon->At(mun);
+///for HT we want events with all muons pt > 10 and |eta|< 2.4
+if(mu->PT > 10 && mu->Eta < 2.4 && mu->Eta > (-2.4))
+{
+//the zeroth component is the tag of the mu/first:pt /second:phi/third:eta
+muvec.push_back((double) mun);
+muvec.push_back(mu->PT);
+muvec.push_back((double)mu->Phi);
+muvec.push_back((double)mu->Eta);
+vecmuvec.push_back(muvec);
+
+/// end of if over pt and eta for HT
+}
+////end of loop over muons
+}
 ///making the values zero for each event
 totPx=0;
 totPy=0;
@@ -270,49 +324,7 @@ terminator+=1;
 ///calculate MHT
 MHT = sqrt( totPx*totPx + totPy*totPy );
 
-////loop over electrons (load them to a vector)
-elecvec.clear();
-vecelecvec.clear();
-for(int elecn=0; elecn <branchElectron->GetEntries();elecn++)
-{
 
-Electron* elec = (Electron*) branchElectron->At(elecn);
-///for HT we want events with all elecs pt > 10 and |eta|< 2.5
-if(elec->PT > 10 && elec->Eta < 2.5 && elec->Eta > (-2.5))
-{
-//the zeroth component is the tag of the elec/first:pt /second:phi/third:eta
-elecvec.push_back((double) elecn);
-elecvec.push_back(elec->PT);
-elecvec.push_back((double)elec->Phi);
-elecvec.push_back((double)elec->Eta);
-vecelecvec.push_back(elecvec);
-
-/// end of if over pt and eta for HT
-} 
-////end of loop over electrons
-}
-
-////loop over muons    (load them to a vector)
-muvec.clear();
-vecmuvec.clear();
-for(int mun=0; mun <branchMuon->GetEntries();mun++)
-{
-
-Muon* mu = (Muon*) branchMuon->At(mun);
-///for HT we want events with all muons pt > 10 and |eta|< 2.4
-if(mu->PT > 10 && mu->Eta < 2.4 && mu->Eta > (-2.4))
-{
-//the zeroth component is the tag of the mu/first:pt /second:phi/third:eta
-muvec.push_back((double) mun);
-muvec.push_back(mu->PT);
-muvec.push_back((double)mu->Phi);
-muvec.push_back((double)mu->Eta);
-vecmuvec.push_back(muvec);
-
-/// end of if over pt and eta for HT
-}
-////end of loop over muons
-}
 
 //build and array that contains the quantities we need a histogram for. Here order is important and must be the same as RA2nocutvec
 double eveinfvec[] = {weight, HT, MHT , vecjetvec.size()}; //the last one gives the RA2 defined number of jets.
