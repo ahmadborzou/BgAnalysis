@@ -1,3 +1,12 @@
+/*
+Code's main Structure:
+First in the int main() the constructor of mainClass will be called. In this mainClass particles will be loaded, all the cuts will be applied and histograms will be filled. To
+fill the histograms from inside mainClass the constructor of histClass will be called.
+
+
+*/
+
+
 #include "TChain.h"
 #include "TH1.h"
 #include <cstdio>
@@ -90,6 +99,40 @@ return false;
 } //end of function bg_type
 
 
+bool jetremove(Jet * jet , vector<Muon> muonvec, vector<Electron> electronvec, vector<Photon> photonvec){
+////////////////////////////Modifying-Removing some Jets
+//Reference Ben
+//  --> Matching jet and lepton in the eta-phi plane. In case of matched,
+//  compare the energy fraction: 
+//  * fraction > 90% (mostly jet from the lepton), remove this jet
+//  * fraction < 90%: additional energy from pileup, just correct this jet by
+//  removing the lepton energy
+for(int i = 0; i < muonvec.size(); ++i){
+if(jet->P4().DeltaR(muonvec[i].P4()) < .4) //hint:jet->P4() returns a TLorentzVector
+{
+if(muonvec[i].P4().E()/jet->P4().E() > .9) return true;
+}
+}
+for(int i = 0; i < electronvec.size(); ++i){
+if(jet->P4().DeltaR(electronvec[i].P4()) < .4)
+{
+if(electronvec[i].P4().E()/jet->P4().E() > .9) return true;
+}
+}
+for(int i = 0; i < photonvec.size(); ++i){
+if(jet->P4().DeltaR(photonvec[i].P4()) < .4)
+{
+if(photonvec[i].P4().E()/jet->P4().E() > .9)
+{//cout << " photon: deltar " << jet->P4().DeltaR(photonvec[i].P4()) << ", energy fraction " << photonvec[i].P4().E()/jet->P4().E() <<  endl; 
+ return true;
+ }
+}
+}
+
+return false; //if false is returned, jet shouldn't be removed
+
+}//end of jetremove()
+
 ///////////////////////////////////////////
 //Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()
 ////////////////////////////////////////////
@@ -98,11 +141,11 @@ class mainClass{
 int terminator, threejetev, fourjetev, fivejetev, sixjetev, HTev, MHTev, delphicutn, finalHTev, finalMHTev, nolePev;
 float xs, xserr;
 double weight, CrossSection, CrossSectionError, totPx, totPy, HT, MHT, cutHT, cutMHT, pt, coss, sinn;
-vector<vector<double> > vecjetvec, vecelecvec, vecmuvec;
-vector<double> jetvec, elecvec, muvec;
+vector<vector<double> > vecjvec, vecelecvec, vecmuvec;
+vector<double> jvec, elecvec, muvec;
 vector<GenParticle*> GenParticlevec;
 vector<TH1D > vec;
-vector<Photon> photonvec;
+vector<Photon> photonvec; vector< Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
 char TreeList[200], tempname[200];
 string pro, line;
 fstream file, input;
@@ -189,8 +232,8 @@ TClonesArray * branchParticle = treeReader->UseBranch("Particle");
 cout << "the total number of events: " << treeReader->GetEntries() << endl; 
 
 //Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events/
-for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
-//for(int entry = 0; entry < 1000; entry++){
+//for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
+for(int entry = 0; entry < 10000; entry++){
 treeReader->ReadEntry(entry);
 
 //Set Weight
@@ -202,7 +245,8 @@ if (entry % 5000 == 0){cout << "--------------------" << entry << endl;}
 
 //MET and HT of the event
 MissingET* met =(MissingET*) branchHT->At(0); 
-//cout << "MET : " << met->MET << endl;
+cout << "MET: " << met->MET << endl;
+cout << "MHT: " << MHT << endl;
 ScalarHT* ht= (ScalarHT*) branchHT->At(0);
 //cout << "HT : " << ht->HT << endl;
 
@@ -226,6 +270,7 @@ for (int i = 0; i < branchPhoton->GetEntries(); ++i)
 /////////////////end of loop over photons
 
 ////loop over electrons (load them to a vector)
+electronvec.clear();
 elecvec.clear();
 vecelecvec.clear();
 for(int elecn=0; elecn <branchElectron->GetEntries();elecn++)
@@ -241,13 +286,14 @@ elecvec.push_back(elec->PT);
 elecvec.push_back((double)elec->Phi);
 elecvec.push_back((double)elec->Eta);
 vecelecvec.push_back(elecvec);
-
+electronvec.push_back(*elec);
 /// end of if over pt and eta for HT
 } 
 ////end of loop over electrons
 }
 
 ////loop over muons    (load them to a vector)
+muonvec.clear();
 muvec.clear();
 vecmuvec.clear();
 for(int mun=0; mun <branchMuon->GetEntries();mun++)
@@ -263,7 +309,7 @@ muvec.push_back(mu->PT);
 muvec.push_back((double)mu->Phi);
 muvec.push_back((double)mu->Eta);
 vecmuvec.push_back(muvec);
-
+muonvec.push_back(*mu);
 /// end of if over pt and eta for HT
 }
 ////end of loop over muons
@@ -273,25 +319,26 @@ totPx=0;
 totPy=0;
 HT=0;
 ///////////////////////////////////////////////////////////////////loop over jets    (load them to a vector)
-vecjetvec.clear();
 jetvec.clear();
+vecjvec.clear();
+jvec.clear();
 for(int jetn=0; jetn <branchJet->GetEntries();jetn++){
-
 Jet* jet = (Jet*) branchJet->At(jetn);
 sinn = (double) sin(jet->Phi);
 coss = (double) cos(jet->Phi);
 pt = jet->PT;
 
+
 ///for HT we want events with all jets pt > 50 and |eta|< 2.5
+//if(pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5) && jetremove(jet,muonvec,electronvec,photonvec)==false)
 if(pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5))
 {
 //the zeroth component is the tag of the jet/first:pt /second:phi/third:eta
-jetvec.push_back((double) jetn);
-jetvec.push_back(pt);
-jetvec.push_back((double)jet->Phi);
-jetvec.push_back((double)jet->Eta);
-vecjetvec.push_back(jetvec);
-
+jvec.push_back((double) jetn);
+jvec.push_back(pt);
+jvec.push_back((double)jet->Phi);
+jvec.push_back((double)jet->Eta);
+vecjvec.push_back(jvec);
 ///calculate HT
 HT+=pt;
 /// end of if over pt and eta for HT
@@ -310,10 +357,10 @@ totPy += pt * sinn;
 ///find the three most energetic jets
 while(terminator!=0){
 terminator=0;
-for(int iv=0; iv<vecjetvec.size()-1;iv++){
+for(int iv=0; iv<vecjvec.size()-1;iv++){
 
-if(vecjetvec[iv][1]<vecjetvec[iv+1][1]){
-swap(vecjetvec[iv],vecjetvec[iv+1]);
+if(vecjvec[iv][1]<vecjvec[iv+1][1]){
+swap(vecjvec[iv],vecjvec[iv+1]);
 terminator+=1;
 }
 //end of the for
@@ -327,7 +374,7 @@ MHT = sqrt( totPx*totPx + totPy*totPy );
 
 
 //build and array that contains the quantities we need a histogram for. Here order is important and must be the same as RA2nocutvec
-double eveinfvec[] = {weight, HT, MHT , vecjetvec.size()}; //the last one gives the RA2 defined number of jets.
+double eveinfvec[] = {weight, HT, MHT , vecjvec.size()}; //the last one gives the RA2 defined number of jets.
 
 
 //loop over all the different backgrounds: "allEvents", "Wlv", "Zvv"
@@ -336,11 +383,6 @@ for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt
 //cout << "bg_type:  " << itt->first << ", bool:  " << bg_type(itt->first , GenParticlevec) << endl;
 //determine what type of background should pass
 if(bg_type(itt->first , GenParticlevec)==true){//all the cuts are inside this
-
-
-
-
-
 
 
 //call the constructor of the histClass to fill the histograms before cuts are applied.
@@ -353,7 +395,7 @@ histClass nocut_Object( &eveinfvec[0] , &itt->second["RA2nocut"][0] );
 //if(fabs(MHT-met->MET)/(MHT+met->MET)<0.2){
 
 /// jetcut
-if(vecjetvec.size() >= 3 && vecjetvec[0][1]> 50 ){
+if(vecjvec.size() >= 3 && vecjvec[0][1]> 50 ){
 threejetev+=1;
 histClass Jet3cut_Object( &eveinfvec[0] , &itt->second["RA23Jetcut"][0] );
 ///HT cut
@@ -365,7 +407,7 @@ if(MHT>=200){
 MHTev+=1;
 histClass MHT200cut_Object( &eveinfvec[0] , &itt->second["RA2MHT200cut"][0] );
 ///delta phi cut
-if(delphi(vecjetvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjetvec[1],totPx,totPy,MHT)>0.3 && delphi(vecjetvec[2],totPx,totPy,MHT)>0.3)
+if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.3 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)
 {
 delphicutn+=1;
 histClass delphicut_Object( &eveinfvec[0] , &itt->second["RA2delphicut"][0] );
@@ -378,15 +420,15 @@ if(vecmuvec.size()==0)
 nolePev+=1;
 histClass noleptoncut_Object( &eveinfvec[0] , &itt->second["RA2noleptoncut"][0] );
 
-if(vecjetvec.size() >= 4){
+if(vecjvec.size() >= 4){
 fourjetev+=1;
 histClass Jet4cut_Object( &eveinfvec[0] , &itt->second["RA24Jetcut"][0] );
 
-if(vecjetvec.size() >= 5){
+if(vecjvec.size() >= 5){
 fivejetev+=1;
 histClass Jet5cut_Object( &eveinfvec[0] , &itt->second["RA25Jetcut"][0] );
 
-if(vecjetvec.size() >= 6){
+if(vecjvec.size() >= 6){
 sixjetev+=1;
 histClass Jet6cut_Object( &eveinfvec[0] , &itt->second["RA26Jetcut"][0] );
 
