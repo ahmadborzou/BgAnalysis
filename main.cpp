@@ -3,12 +3,13 @@ Code's main Structure:
 First in the int main() the constructor of mainClass will be called. In this mainClass particles will be loaded, all the cuts will be applied and histograms will be filled. To
 fill the histograms from inside mainClass the constructor of histClass will be called.
 
-
+To define a cut first name it inside the cutname which is a map. Then tell what cuts should be applied, when this name is called, inside checkcut()
 */
 
-
+#include <cassert>
 #include "TChain.h"
 #include "TH1.h"
+#include "TVector2.h"
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -29,7 +30,7 @@ class histClass{
 double * a;
 TH1D * b_hist;
 public:
-histClass(double * eveinfarr_, TH1D * hist_){
+void fill(double * eveinfarr_, TH1D * hist_){
 a = eveinfarr_;
 b_hist=hist_;
 (*b_hist).Fill(*a);
@@ -125,7 +126,7 @@ if(jet->P4().DeltaR(photonvec[i].P4()) < .4)
 if(photonvec[i].P4().E()/jet->P4().E() > .9)
 {//cout << " photon: deltar " << jet->P4().DeltaR(photonvec[i].P4()) << ", energy fraction " << photonvec[i].P4().E()/jet->P4().E() <<  endl; 
  return true;
- }
+}
 }
 }
 
@@ -133,12 +134,40 @@ return false; //if false is returned, jet shouldn't be removed
 
 }//end of jetremove()
 
+bool METMHTAsys(string PileUp ,MissingET* met,vector<Jet> jetvec,vector<Muon> muonvec,vector<Electron> electronvec,vector<Photon> photonvec){
+double Met=-99;
+double METAsys=-99;
+double AsysCut = -99;
+TVector2 PUCorMet;
+if (PileUp == "NoPileUp") AsysCut = 0.2;
+if (PileUp == "50PileUp") AsysCut = 0.3;
+if (PileUp == "140PileUp") AsysCut = 0.5;
+assert(AsysCut != -99.);
+TLorentzVector allvecsum;
+allvecsum.SetPxPyPzE(0, 0, 0, 0);
+PUCorMet.Set(0., 0.);
+for(int i=0; i<jetvec.size(); i++) {allvecsum += jetvec.at(i).P4();}
+for(int j=0; j<muonvec.size(); j++) {allvecsum += muonvec.at(j).P4();}
+for(int k=0; k<electronvec.size(); k++) {allvecsum += electronvec.at(k).P4();}
+for(int l=0; l<photonvec.size(); l++) {allvecsum += photonvec.at(l).P4();}
+
+
+PUCorMet.Set(-allvecsum.Px(),-allvecsum.Py());
+Met= PUCorMet.Mod();
+
+METAsys=fabs(Met-(met->MET))/(Met+(met->MET));
+
+return METAsys < AsysCut;
+}
+
+
+
 ///////////////////////////////////////////
 //Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()
 ////////////////////////////////////////////
 class mainClass{
 //List of variables
-int terminator, threejetev, fourjetev, fivejetev, sixjetev, HTev, MHTev, delphicutn, finalHTev, finalMHTev, nolePev;
+int terminator;
 float xs, xserr;
 double weight, CrossSection, CrossSectionError, totPx, totPy, HT, MHT, cutHT, cutMHT, pt, coss, sinn;
 vector<vector<double> > vecjvec, vecelecvec, vecmuvec;
@@ -148,16 +177,53 @@ vector<TH1D > vec;
 vector<Photon> photonvec; vector< Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
 char TreeList[200], tempname[200];
 string pro, line;
-fstream file, input;
+map<int, string> cutname;
+fstream file, input, cutflowfile;
+map<string, TH1D> cutflowmap;
 map<string , vector<TH1D> > cut_histvec_map;  
 map<string, map<string , vector<TH1D> > > map_map;
+map<string, histClass> histobjmap;
+histClass histObj;
+//define different cuts here
+bool threejet(){if(vecjvec.size() >= 3 && vecjvec[0][1]> 50 )return true; return false;}
+bool ht(){if(HT>=500) return true; return false;}
+bool mht(){if(MHT>=200)return true; return false;}
+bool dphi(){if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.3 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)return true; return false;}
+bool nolep(){if(vecelecvec.size()==0 && vecmuvec.size()==0)return true; return false;}
+bool fourjet(){if(vecjvec.size() >= 4)return true; return false;}
+bool fivejet(){if(vecjvec.size() >= 5)return true; return false;}
+bool sixjet(){if(vecjvec.size() >= 6)return true; return false;}
+bool highMht(){if(MHT>=1000)return true; return false;}
+bool highHt(){if(HT>=2500)return true; return false;}
+//Reference: Ben
+//there are jets missing in the event, which cause much larger MHT than expected. In order to supress this problem,
+//bool Asys(){if(METMHTAsys(Pileup,met,jetvec,muonvec,electronvec,photonvec))return true; return false;}
+
+
+//function checkcut()
+bool checkcut(string ss){
+if(ss == cutname[0])return true;
+if(ss== cutname[1]){if(threejet())return true;}
+if(ss== cutname[2]){if(threejet() && ht())return true;}
+if(ss== cutname[3]){if(threejet()&&ht()&&mht())return true;}
+if(ss== cutname[4]){if(threejet()&&ht()&&mht()&&dphi())return true;}
+if(ss== cutname[5]){if(threejet()&&ht()&&mht()&&dphi()&&nolep())return true;}
+if(ss== cutname[6]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&fourjet())return true;}
+if(ss== cutname[7]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&fivejet())return true;}
+if(ss== cutname[8]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet())return true;}
+if(ss== cutname[9]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highMht())return true;}
+if(ss== cutname[10]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt())return true;}
+if(ss== cutname[11]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt()&&highMht())return true;}
+
+return false; 
+}
+
 //constructor
 public:
 mainClass(string Pileup, string Process, string Detector, string Outdir, string inputnumber){
-terminator=0;threejetev=0;fourjetev=0;fivejetev=0;sixjetev=0;HTev=0;MHTev=0;delphicutn=0;finalHTev=0;finalMHTev=0;nolePev=0;
-weight=0; CrossSection=-999.0; CrossSectionError=0.0; totPx=0; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
+terminator=0; CrossSection=-999.0; CrossSectionError=0.0; totPx=0; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
 TChain chain("Delphes");
-string cutname[]={"RA2nocut", "RA23Jetcut", "RA2HT500cut", "RA2MHT200cut", "RA2delphicut", "RA2noleptoncut", "RA24Jetcut", "RA25Jetcut", "RA26Jetcut", "RA2allbutHT2500cut", "RA2allbutMHT1000cut", "RA2allcut"};
+
 //build a vector of histograms
 TH1D  weight_hist = TH1D("weight", "Weight Distribution", 5,0,5);
 vec.push_back(weight_hist);
@@ -167,12 +233,27 @@ TH1D  RA2MHT_hist =  TH1D("MHT","MHT Distribution",100,0,5000);
 vec.push_back(RA2MHT_hist);
 TH1D  RA2NJet_hist = TH1D("NJet","Number of Jets Distribution",10,0,20);
 vec.push_back(RA2NJet_hist);
+
+
+TH1D cutflowhist = TH1D("cutflowhist","Cut Flow", 30,0,30);
+for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt!=map_map.end();itt++){
+cutflowmap[itt->first]=cutflowhist;
+}
+
 //initialize a map between string=cutnames and histvecs. copy one histvec into all of them. The histograms, though, will be filled differently.
-cut_histvec_map["RA2nocut"]=vec;cut_histvec_map["RA23Jetcut"]=vec;cut_histvec_map["RA2HT500cut"]=vec;cut_histvec_map["RA2MHT200cut"]=vec;cut_histvec_map["RA2delphicut"]=vec;
-cut_histvec_map["RA2noleptoncut"]=vec;cut_histvec_map["RA24Jetcut"]=vec;cut_histvec_map["RA25Jetcut"]=vec;cut_histvec_map["RA26Jetcut"]=vec;
-cut_histvec_map["RA2allbutHT2500cut"]=vec;cut_histvec_map["RA2allbutMHT1000cut"]=vec;cut_histvec_map["RA2allcut"]=vec;
+cutname[0]="RA2nocut";cutname[1]="RA23Jetcut";cutname[2]="RA2HT500cut" ;cutname[3]="RA2MHT200cut" ;cutname[4]="RA2delphicut" ;cutname[5]="RA2noleptoncut" ;cutname[6]="RA24Jetcut" ;cutname[7]="RA25Jetcut" ;cutname[8]="RA26Jetcut" ;cutname[9]="RA2allbutHT2500cut" ;cutname[10]="RA2allbutMHT1000cut";cutname[11]= "RA2allcut";
+for(int i=0; i< cutname.size();i++){
+cut_histvec_map[cutname[i]]=vec;
+}
+
 //initialize a map between string and maps. copy the map of histvecs into each
 map_map["allEvents"]=cut_histvec_map; map_map["Zvv"]=cut_histvec_map; map_map["Wlv"]=cut_histvec_map;
+
+//initialize histobjmap
+for(map<string , vector<TH1D> >::iterator it=cut_histvec_map.begin(); it!=cut_histvec_map.end();it++){
+histobjmap[it->first]=histObj;
+
+}
 
 ///Add the root files to a chain called Delphes
 sprintf(TreeList,"./FileList/%s/%s_%s_%s",Detector.c_str(),Process.c_str(),Pileup.c_str(),inputnumber.c_str());
@@ -233,7 +314,7 @@ cout << "the total number of events: " << treeReader->GetEntries() << endl;
 
 //Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events/
 //for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
-for(int entry = 0; entry < 10000; entry++){
+for(int entry = 0; entry < 1000; entry++){
 treeReader->ReadEntry(entry);
 
 //Set Weight
@@ -245,8 +326,8 @@ if (entry % 5000 == 0){cout << "--------------------" << entry << endl;}
 
 //MET and HT of the event
 MissingET* met =(MissingET*) branchHT->At(0); 
-cout << "MET: " << met->MET << endl;
-cout << "MHT: " << MHT << endl;
+//cout << "MET: " << met->MET << endl;
+//cout << "MHT: " << MHT << endl;
 ScalarHT* ht= (ScalarHT*) branchHT->At(0);
 //cout << "HT : " << ht->HT << endl;
 
@@ -327,7 +408,7 @@ Jet* jet = (Jet*) branchJet->At(jetn);
 sinn = (double) sin(jet->Phi);
 coss = (double) cos(jet->Phi);
 pt = jet->PT;
-
+jetvec.push_back(*jet);
 
 ///for HT we want events with all jets pt > 50 and |eta|< 2.5
 //if(pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5) && jetremove(jet,muonvec,electronvec,photonvec)==false)
@@ -368,10 +449,9 @@ terminator+=1;
 //end of the while
 }
 ///end of find the three most energetic jets
+
 ///calculate MHT
 MHT = sqrt( totPx*totPx + totPy*totPy );
-
-
 
 //build and array that contains the quantities we need a histogram for. Here order is important and must be the same as RA2nocutvec
 double eveinfvec[] = {weight, HT, MHT , vecjvec.size()}; //the last one gives the RA2 defined number of jets.
@@ -385,94 +465,37 @@ for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt
 if(bg_type(itt->first , GenParticlevec)==true){//all the cuts are inside this
 
 
-//call the constructor of the histClass to fill the histograms before cuts are applied.
-histClass nocut_Object( &eveinfvec[0] , &itt->second["RA2nocut"][0] );
-
 //Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts
 
-//there are jets missing in the event, which cause much larger MHT than expected. In order to supress this problem,
-// we calculate the METMHTAsys by |MHT-MET|/(MHT+MET)
-//if(fabs(MHT-met->MET)/(MHT+met->MET)<0.2){
+//loop over cut names and fill the histograms
+for(map<string , vector<TH1D> >::iterator ite=cut_histvec_map.begin(); ite!=cut_histvec_map.end();ite++){
+if(checkcut(ite->first)==true){histobjmap[ite->first].fill( &eveinfvec[0] ,&itt->second[ite->first][0]);}
+}//end of loop over cut names
 
-/// jetcut
-if(vecjvec.size() >= 3 && vecjvec[0][1]> 50 ){
-threejetev+=1;
-histClass Jet3cut_Object( &eveinfvec[0] , &itt->second["RA23Jetcut"][0] );
-///HT cut
-if(HT>=500){
-HTev+=1;
-histClass HT500cut_Object( &eveinfvec[0] , &itt->second["RA2HT500cut"][0] );
-///MHT cut
-if(MHT>=200){
-MHTev+=1;
-histClass MHT200cut_Object( &eveinfvec[0] , &itt->second["RA2MHT200cut"][0] );
-///delta phi cut
-if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.3 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)
-{
-delphicutn+=1;
-histClass delphicut_Object( &eveinfvec[0] , &itt->second["RA2delphicut"][0] );
-/// electron veto
-if(vecelecvec.size()==0)
-{
-///muon veto
-if(vecmuvec.size()==0)
-{
-nolePev+=1;
-histClass noleptoncut_Object( &eveinfvec[0] , &itt->second["RA2noleptoncut"][0] );
-
-if(vecjvec.size() >= 4){
-fourjetev+=1;
-histClass Jet4cut_Object( &eveinfvec[0] , &itt->second["RA24Jetcut"][0] );
-
-if(vecjvec.size() >= 5){
-fivejetev+=1;
-histClass Jet5cut_Object( &eveinfvec[0] , &itt->second["RA25Jetcut"][0] );
-
-if(vecjvec.size() >= 6){
-sixjetev+=1;
-histClass Jet6cut_Object( &eveinfvec[0] , &itt->second["RA26Jetcut"][0] );
-
-if(MHT>=1000){ histClass allbutHT2500cut_Object( &eveinfvec[0] , &itt->second["RA2allbutHT2500cut"][0] );
-}
-
-
-if(HT>=2500){
-finalHTev+=1;
-histClass allbutMHT1000cut_Object(&eveinfvec[0] , &itt->second["RA2allbutMHT1000cut"][0]);
-///Search region one MHT cut
-if(MHT>=1000){
-finalMHTev+=1;
-
-histClass allcut_Object(&eveinfvec[0] , &itt->second["RA2allcut"][0]);
-
-///Search region one MHT cut
-}
-///end of Search region one HT cut
-}
-///end of 6jetcut if
-}
-///end of 5jetcut if
-}
-///end of 4jetcut if
-}
-//end of muon if
-}
-//end of lepton if
-}
-///end of deltaphi if
-}
-//end of MHT if
-}
-//end of HT if
-}
-}///end of 3jetcut if
-//}// end of |MHT-MET|/(MHT+MET)<0.2
 //EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts//EndOfCuts
+
 
 }//end of bg_type determination
 }//end of loop over all the different backgrounds: "allEvents", "Wlv", "Zvv"
 
 }///End of loop over all Events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//
+
+
+//fill the cut flow here
+//we generate one cut flow hist for each bg type. bins inside each histogram correspond to different cut names
+int nnn;
+for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt!=map_map.end();itt++){
+nnn=0;
+for(map<string , vector<TH1D> >::iterator it=itt->second.begin(); it!=itt->second.end();it++){
+//cutflowmap[itt->first].GetXaxis()->SetBinLabel(nnn+1,it->first.c_str());
+//cutflowmap[itt->first].SetBinContent(nnn,it->second[1].GetEntries());
+cutflowmap[itt->first].Fill(it->first.c_str(),it->second[1].GetEntries());
+nnn+=1;
+}
+}
+
+
+
 
 //open a file to write the histograms
 sprintf(tempname,"%s/results_%s_%s_%s_%s.root",Outdir.c_str(),Detector.c_str(),Process.c_str(),Pileup.c_str(),inputnumber.c_str());
@@ -483,6 +506,7 @@ TDirectory *cdtoit;
 for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt!=map_map.end();itt++){
 cdtoitt = resFile->mkdir((itt->first).c_str());
 cdtoitt->cd();
+cutflowmap[itt->first].Write("CutFlow");
 for(map<string , vector<TH1D> >::iterator it=itt->second.begin(); it!=itt->second.end();it++){ 
 cdtoit =  cdtoitt->mkdir((it->first).c_str());
 cdtoit->cd();
