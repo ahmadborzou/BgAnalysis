@@ -55,6 +55,31 @@ bool bg_type(string bg_ ,vector<GenParticle*> pvec){
 
 if(bg_=="allEvents"){return 1;}
 
+if(bg_=="H"){
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * p = pvec.at(i);
+if(fabs(p->PID)==25)return true;
+}
+return false;
+}
+
+if(bg_=="photon"){
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * p = pvec.at(i);
+if(fabs(p->PID)==22)return true;
+}
+return false;
+}
+
+
+if(bg_=="Z"){
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * p = pvec.at(i);
+if(fabs(p->PID)==23)return true;
+}
+return false;
+}
+
 if(bg_=="Zvv"){
 vector<int> vvvec;
 for(int i = 0; i < pvec.size(); ++i){
@@ -63,7 +88,6 @@ if(fabs(p->PID)==23){//23 is the PID code of Z boson.
 vvvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
 GenParticle * pp = pvec.at(j);
-//if (pp->Status != 3 || pp->M1 > pvec.size() || pp->M2 > pvec.size() ){continue;}// Assuming the status 3 electron directly from Z. Delphes has broken mother links, can't track back to mother Z
 if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 12 || fabs(pp->PID) == 14 || fabs(pp->PID) == 16 ){
 vvvec.push_back(pp->PID);
 }//end of if pp->PID == 12, 14, 16 = nutrinos
@@ -75,6 +99,59 @@ return true;}//end of if
 return false;
 }//end of if Zvv
 
+if(bg_=="Zll"){
+vector<int> vvvec;
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * p = pvec.at(i);
+if(fabs(p->PID)==23){//23 is the PID code of Z boson.
+vvvec.clear();
+for(int j = 0; j < pvec.size(); ++j){
+GenParticle * pp = pvec.at(j);
+if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 11 || fabs(pp->PID) == 13 || fabs(pp->PID) == 15){
+vvvec.push_back(pp->PID);
+}//end of if pp->PID == 11, 13 15 = leptons
+}//end of second loop
+if(vvvec.size()==2){
+return true;}//end of if 
+}//end of if PID==23=Z boson
+}//end of loop
+return false;
+}//end of if Zll
+
+
+if(bg_=="Zjj"){
+vector<int> vvvec;
+vector<int> llvec;
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * p = pvec.at(i);
+if(fabs(p->PID)==23){//23 is the PID code of Z boson.
+vvvec.clear();
+llvec.clear();
+for(int j = 0; j < pvec.size(); ++j){
+GenParticle * pp = pvec.at(j);
+if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 11 || fabs(pp->PID) == 13 || fabs(pp->PID) == 15){
+llvec.push_back(pp->PID);
+}//end of if pp->PID == 11, 13 15 = leptons
+if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 12 || fabs(pp->PID) == 14 || fabs(pp->PID) == 16){
+vvvec.push_back(pp->PID);
+}//end of if pp->PID == 12, 14, 16 = neutrino
+
+}//end of second loop
+if(vvvec.size()==2 || llvec.size()==2){
+return false;}else return true;//end of if 
+}//end of if PID==23=Z boson
+}//end of loop
+return false;
+}//end of if Zjj
+
+
+if(bg_=="W"){
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * pa = pvec.at(i);
+if(fabs(pa->PID)==24)return true;
+}
+return false;
+}
 
 if(bg_=="Wlv"){
 vector<int> llvec;
@@ -84,7 +161,6 @@ if(fabs(pa->PID)==24){//+-24 are the PID codes of W bosons.
 llvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
 GenParticle * ppa = pvec.at(j);
-//if (ppa->Status != 3 || ppa->M1 > pvec.size() || ppa->M2 > pvec.size() ){continue;}// Assuming the status 3 electron directly from W. Delphes has broken mother links, can't track back to mother W
 if (ppa->Status == 3 && ppa->M1 < pvec.size() && ppa->M2 < pvec.size() && fabs(ppa->PID) == 11 || fabs(ppa->PID) == 13 || fabs(ppa->PID) == 15 ){
 llvec.push_back(ppa->PID);
 }//end of if ppa->PID == 11, 13, 15 = electron , muon, tau
@@ -95,6 +171,26 @@ return true;}//end of if
 }//end of loop
 return false;
 }//end of if Wlv
+
+
+if(bg_=="Wjj"){
+vector<int> llvec;
+for(int i = 0; i < pvec.size(); ++i){
+GenParticle * pa = pvec.at(i);
+if(fabs(pa->PID)==24){//+-24 are the PID codes of W bosons.
+llvec.clear();
+for(int j = 0; j < pvec.size(); ++j){
+GenParticle * ppa = pvec.at(j);
+if (ppa->Status == 3 && ppa->M1 < pvec.size() && ppa->M2 < pvec.size() && fabs(ppa->PID) == 11 || fabs(ppa->PID) == 13 || fabs(ppa->PID) == 15 ){
+llvec.push_back(ppa->PID);
+}//end of if ppa->PID == 11, 13, 15 = electron , muon, tau
+}//end of second loop
+if(llvec.size()==1){//llvec.size() ==1 since W decays to one lepton and one nutrino
+return false;}else return true;//end of if 
+}//end of if PID==24=W boson
+}//end of loop
+return false;
+}//end of if Wjj
 
 
 } //end of function bg_type
@@ -138,7 +234,7 @@ bool METMHTAsys(string PileUp ,MissingET* met,vector<Jet> jetvec,vector<Muon> mu
 double Met=-99;
 double METAsys=-99;
 double AsysCut = -99;
-TVector2 PUCorMet;
+TVector2 PUCorMet, RawMet;
 if (PileUp == "NoPileUp") AsysCut = 0.2;
 if (PileUp == "50PileUp") AsysCut = 0.3;
 if (PileUp == "140PileUp") AsysCut = 0.5;
@@ -146,6 +242,8 @@ assert(AsysCut != -99.);
 TLorentzVector allvecsum;
 allvecsum.SetPxPyPzE(0, 0, 0, 0);
 PUCorMet.Set(0., 0.);
+RawMet.Set(0.0, 0.0);
+
 for(int i=0; i<jetvec.size(); i++) {allvecsum += jetvec.at(i).P4();}
 for(int j=0; j<muonvec.size(); j++) {allvecsum += muonvec.at(j).P4();}
 for(int k=0; k<electronvec.size(); k++) {allvecsum += electronvec.at(k).P4();}
@@ -154,8 +252,9 @@ for(int l=0; l<photonvec.size(); l++) {allvecsum += photonvec.at(l).P4();}
 
 PUCorMet.Set(-allvecsum.Px(),-allvecsum.Py());
 Met= PUCorMet.Mod();
+RawMet.SetMagPhi(met->MET, met->Phi);
 
-METAsys=fabs(Met-(met->MET))/(Met+(met->MET));
+METAsys=fabs(Met-(RawMet.Mod()))/(Met+(RawMet.Mod()));//this is funny. RawMet.Mod() must return met->MET. We didn't need to build RawMet to obtain its magnitude :)
 
 return METAsys < AsysCut;
 }
@@ -176,7 +275,7 @@ vector<GenParticle*> GenParticlevec;
 vector<TH1D > vec;
 vector<Photon> photonvec; vector< Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
 char TreeList[200], tempname[200];
-string pro, line;
+string pro, line, Pileup_ ;
 map<int, string> cutname;
 fstream file, input, cutflowfile;
 map<string, TH1D> cutflowmap;
@@ -184,11 +283,25 @@ map<string , vector<TH1D> > cut_histvec_map;
 map<string, map<string , vector<TH1D> > > map_map;
 map<string, histClass> histobjmap;
 histClass histObj;
+MissingET* met ;
+ScalarHT* sht; 
+TClonesArray * branchEvent ;
+TClonesArray * branchJet;
+TClonesArray * branchElectron;
+TClonesArray * branchMuon;
+TClonesArray * branchPhoton;
+TClonesArray * branchMet;
+TClonesArray * branchHT;
+TClonesArray * branchParticle;
+
+
+
+
 //define different cuts here
 bool threejet(){if(vecjvec.size() >= 3 && vecjvec[0][1]> 50 )return true; return false;}
 bool ht(){if(HT>=500) return true; return false;}
 bool mht(){if(MHT>=200)return true; return false;}
-bool dphi(){if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.3 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)return true; return false;}
+bool dphi(){if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.5 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)return true; return false;}
 bool nolep(){if(vecelecvec.size()==0 && vecmuvec.size()==0)return true; return false;}
 bool fourjet(){if(vecjvec.size() >= 4)return true; return false;}
 bool fivejet(){if(vecjvec.size() >= 5)return true; return false;}
@@ -197,7 +310,7 @@ bool highMht(){if(MHT>=1000)return true; return false;}
 bool highHt(){if(HT>=2500)return true; return false;}
 //Reference: Ben
 //there are jets missing in the event, which cause much larger MHT than expected. In order to supress this problem,
-//bool Asys(){if(METMHTAsys(Pileup,met,jetvec,muonvec,electronvec,photonvec))return true; return false;}
+bool Asys(){if(METMHTAsys(Pileup_,met,jetvec,muonvec,electronvec,photonvec))return true; return false;}
 
 
 //function checkcut()
@@ -212,7 +325,9 @@ if(ss== cutname[6]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&fourjet())retur
 if(ss== cutname[7]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&fivejet())return true;}
 if(ss== cutname[8]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet())return true;}
 if(ss== cutname[9]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highMht())return true;}
+if(ss== cutname[12]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highMht()&&Asys())return true;}
 if(ss== cutname[10]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt())return true;}
+if(ss== cutname[13]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt()&&Asys())return true;}
 if(ss== cutname[11]){if(threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt()&&highMht())return true;}
 
 return false; 
@@ -221,9 +336,9 @@ return false;
 //constructor
 public:
 mainClass(string Pileup, string Process, string Detector, string Outdir, string inputnumber){
+Pileup_ = Pileup;
 terminator=0; CrossSection=-999.0; CrossSectionError=0.0; totPx=0; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
 TChain chain("Delphes");
-
 //build a vector of histograms
 TH1D  weight_hist = TH1D("weight", "Weight Distribution", 5,0,5);
 vec.push_back(weight_hist);
@@ -241,13 +356,14 @@ cutflowmap[itt->first]=cutflowhist;
 }
 
 //initialize a map between string=cutnames and histvecs. copy one histvec into all of them. The histograms, though, will be filled differently.
-cutname[0]="RA2nocut";cutname[1]="RA23Jetcut";cutname[2]="RA2HT500cut" ;cutname[3]="RA2MHT200cut" ;cutname[4]="RA2delphicut" ;cutname[5]="RA2noleptoncut" ;cutname[6]="RA24Jetcut" ;cutname[7]="RA25Jetcut" ;cutname[8]="RA26Jetcut" ;cutname[9]="RA2allbutHT2500cut" ;cutname[10]="RA2allbutMHT1000cut";cutname[11]= "RA2allcut";
+cutname[0]="RA2nocut";cutname[1]="RA23Jetcut";cutname[2]="RA2HT500cut" ;cutname[3]="RA2MHT200cut" ;cutname[4]="RA2delphicut" ;cutname[5]="RA2noleptoncut" ;cutname[6]="RA24Jetcut" ;cutname[7]="RA25Jetcut" ;cutname[8]="RA26Jetcut" ;cutname[9]="RA2allbutHT2500cut" ;cutname[10]="RA2allbutMHT1000cut";cutname[11]= "RA2allcut";cutname[12]="RA2_Asys_allbutHT2500";
+cutname[13]="RA2_Asys_allbutMHT1000";
 for(int i=0; i< cutname.size();i++){
 cut_histvec_map[cutname[i]]=vec;
 }
 
 //initialize a map between string and maps. copy the map of histvecs into each
-map_map["allEvents"]=cut_histvec_map; map_map["Zvv"]=cut_histvec_map; map_map["Wlv"]=cut_histvec_map;
+map_map["allEvents"]=cut_histvec_map;map_map["W"]=cut_histvec_map;map_map["Wlv"]=cut_histvec_map;map_map["Wjj"]=cut_histvec_map;map_map["Z"]=cut_histvec_map;map_map["Zll"]=cut_histvec_map; map_map["Zvv"]=cut_histvec_map;map_map["Zjj"]=cut_histvec_map;map_map["photon"]=cut_histvec_map;map_map["H"]=cut_histvec_map; 
 
 //initialize histobjmap
 for(map<string , vector<TH1D> >::iterator it=cut_histvec_map.begin(); it!=cut_histvec_map.end();it++){
@@ -301,21 +417,26 @@ cout<<"\nCrossSection : "<<CrossSection<<" +- "<<CrossSectionError<<endl<<endl;
 // Create object of class ExRootTreeReader
   ExRootTreeReader *treeReader = new ExRootTreeReader(&chain);
 // Get pointers to branches used in this analysis
-TClonesArray * branchEvent  = treeReader->UseBranch("Event");
-TClonesArray * branchJet = treeReader->UseBranch("Jet");
-TClonesArray * branchElectron = treeReader->UseBranch("Electron");
-TClonesArray * branchMuon = treeReader->UseBranch("Muon");
-TClonesArray * branchPhoton = treeReader->UseBranch("Photon");
-TClonesArray * branchMet = treeReader->UseBranch("MissingET");
-TClonesArray * branchHT = treeReader->UseBranch("ScalarHT");
-TClonesArray * branchParticle = treeReader->UseBranch("Particle"); 
+branchEvent  = treeReader->UseBranch("Event");
+branchJet = treeReader->UseBranch("Jet");
+branchElectron = treeReader->UseBranch("Electron");
+branchMuon = treeReader->UseBranch("Muon");
+branchPhoton = treeReader->UseBranch("Photon");
+branchMet = treeReader->UseBranch("MissingET");
+branchHT = treeReader->UseBranch("ScalarHT");
+branchParticle = treeReader->UseBranch("Particle"); 
 //report the total number of events
 cout << "the total number of events: " << treeReader->GetEntries() << endl; 
 
 //Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events/
 //for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
-for(int entry = 0; entry < 1000; entry++){
+for(int entry = 0; entry < 5000; entry++){
 treeReader->ReadEntry(entry);
+
+//met and sht
+met =(MissingET*) branchMet->At(0);
+sht= (ScalarHT*) branchHT->At(0);
+
 
 //Set Weight
 LHEFEvent* event = (LHEFEvent*) branchEvent->At(0);
@@ -324,12 +445,6 @@ weight= event->Weight;
 //a counter
 if (entry % 5000 == 0){cout << "--------------------" << entry << endl;}
 
-//MET and HT of the event
-MissingET* met =(MissingET*) branchHT->At(0); 
-//cout << "MET: " << met->MET << endl;
-//cout << "MHT: " << MHT << endl;
-ScalarHT* ht= (ScalarHT*) branchHT->At(0);
-//cout << "HT : " << ht->HT << endl;
 
 GenParticlevec.clear();
 ///loop over all the particles in the history of an event. load them to a vector
@@ -487,8 +602,6 @@ int nnn;
 for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt!=map_map.end();itt++){
 nnn=0;
 for(map<string , vector<TH1D> >::iterator it=itt->second.begin(); it!=itt->second.end();it++){
-//cutflowmap[itt->first].GetXaxis()->SetBinLabel(nnn+1,it->first.c_str());
-//cutflowmap[itt->first].SetBinContent(nnn,it->second[1].GetEntries());
 cutflowmap[itt->first].Fill(it->first.c_str(),it->second[1].GetEntries());
 nnn+=1;
 }
