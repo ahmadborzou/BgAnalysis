@@ -254,7 +254,7 @@ PUCorMet.Set(-allvecsum.Px(),-allvecsum.Py());
 Met= PUCorMet.Mod();
 RawMet.SetMagPhi(met->MET, met->Phi);
 
-METAsys=fabs(Met-(RawMet.Mod()))/(Met+(RawMet.Mod()));//this is funny. RawMet.Mod() must return met->MET. We didn't need to build RawMet to obtain its magnitude :)
+METAsys=fabs(Met-(RawMet.Mod()))/(Met+(RawMet.Mod()));//this is funny. RawMet.Mod() must return met->MET. We didn't need to build RawMet to obtain its magnitude :):0
 
 return METAsys < AsysCut;
 }
