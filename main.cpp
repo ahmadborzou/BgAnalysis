@@ -19,6 +19,7 @@ To define a cut first name it inside the cutname which is a map. Then tell what 
 #include <string>
 #include "TSystem.h"
 #include "TClonesArray.h"
+#include "TLorentzVector.h"
 #include <vector>
 #include <map>
 #include "Delphes-3.0.10/external/ExRootAnalysis/ExRootTreeReader.h"
@@ -51,13 +52,13 @@ return deltaphi;
 }
 
 //this function is exclusively written for BJ processes with emphesis on one B.
-bool bg_type(string bg_ ,vector<GenParticle*> pvec){
+bool bg_type(string bg_ ,vector<GenParticle> pvec){
 
 if(bg_=="allEvents"){return 1;}
 
 if(bg_=="H"){
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==25)return true;
 }
 return false;
@@ -65,7 +66,7 @@ return false;
 
 if(bg_=="photon"){
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==22)return true;
 }
 return false;
@@ -74,7 +75,7 @@ return false;
 
 if(bg_=="Z"){
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==23)return true;
 }
 return false;
@@ -83,11 +84,11 @@ return false;
 if(bg_=="Zvv"){
 vector<int> vvvec;
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==23){//23 is the PID code of Z boson.
 vvvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
-GenParticle * pp = pvec.at(j);
+GenParticle * pp = &pvec.at(j);
 if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 12 || fabs(pp->PID) == 14 || fabs(pp->PID) == 16 ){
 vvvec.push_back(pp->PID);
 }//end of if pp->PID == 12, 14, 16 = nutrinos
@@ -102,11 +103,11 @@ return false;
 if(bg_=="Zll"){
 vector<int> vvvec;
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==23){//23 is the PID code of Z boson.
 vvvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
-GenParticle * pp = pvec.at(j);
+GenParticle * pp = &pvec.at(j);
 if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 11 || fabs(pp->PID) == 13 || fabs(pp->PID) == 15){
 vvvec.push_back(pp->PID);
 }//end of if pp->PID == 11, 13 15 = leptons
@@ -123,12 +124,12 @@ if(bg_=="Zjj"){
 vector<int> vvvec;
 vector<int> llvec;
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * p = pvec.at(i);
+GenParticle * p = &pvec.at(i);
 if(fabs(p->PID)==23){//23 is the PID code of Z boson.
 vvvec.clear();
 llvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
-GenParticle * pp = pvec.at(j);
+GenParticle * pp = &pvec.at(j);
 if (pp->Status == 3 && pp->M1 < pvec.size() && pp->M2 < pvec.size() && fabs(pp->PID) == 11 || fabs(pp->PID) == 13 || fabs(pp->PID) == 15){
 llvec.push_back(pp->PID);
 }//end of if pp->PID == 11, 13 15 = leptons
@@ -147,7 +148,7 @@ return false;
 
 if(bg_=="W"){
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * pa = pvec.at(i);
+GenParticle * pa = &pvec.at(i);
 if(fabs(pa->PID)==24)return true;
 }
 return false;
@@ -156,11 +157,11 @@ return false;
 if(bg_=="Wlv"){
 vector<int> llvec;
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * pa = pvec.at(i);
+GenParticle * pa = &pvec.at(i);
 if(fabs(pa->PID)==24){//+-24 are the PID codes of W bosons.
 llvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
-GenParticle * ppa = pvec.at(j);
+GenParticle * ppa = &pvec.at(j);
 if (ppa->Status == 3 && ppa->M1 < pvec.size() && ppa->M2 < pvec.size() && fabs(ppa->PID) == 11 || fabs(ppa->PID) == 13 || fabs(ppa->PID) == 15 ){
 llvec.push_back(ppa->PID);
 }//end of if ppa->PID == 11, 13, 15 = electron , muon, tau
@@ -176,11 +177,11 @@ return false;
 if(bg_=="Wjj"){
 vector<int> llvec;
 for(int i = 0; i < pvec.size(); ++i){
-GenParticle * pa = pvec.at(i);
+GenParticle * pa = &pvec.at(i);
 if(fabs(pa->PID)==24){//+-24 are the PID codes of W bosons.
 llvec.clear();
 for(int j = 0; j < pvec.size(); ++j){
-GenParticle * ppa = pvec.at(j);
+GenParticle * ppa = &pvec.at(j);
 if (ppa->Status == 3 && ppa->M1 < pvec.size() && ppa->M2 < pvec.size() && fabs(ppa->PID) == 11 || fabs(ppa->PID) == 13 || fabs(ppa->PID) == 15 ){
 llvec.push_back(ppa->PID);
 }//end of if ppa->PID == 11, 13, 15 = electron , muon, tau
@@ -195,40 +196,6 @@ return false;
 
 } //end of function bg_type
 
-
-bool jetremove(Jet * jet , vector<Muon> muonvec, vector<Electron> electronvec, vector<Photon> photonvec){
-////////////////////////////Modifying-Removing some Jets
-//Reference Ben
-//  --> Matching jet and lepton in the eta-phi plane. In case of matched,
-//  compare the energy fraction: 
-//  * fraction > 90% (mostly jet from the lepton), remove this jet
-//  * fraction < 90%: additional energy from pileup, just correct this jet by
-//  removing the lepton energy
-for(int i = 0; i < muonvec.size(); ++i){
-if(jet->P4().DeltaR(muonvec[i].P4()) < .4) //hint:jet->P4() returns a TLorentzVector
-{
-if(muonvec[i].P4().E()/jet->P4().E() > .9) return true;
-}
-}
-for(int i = 0; i < electronvec.size(); ++i){
-if(jet->P4().DeltaR(electronvec[i].P4()) < .4)
-{
-if(electronvec[i].P4().E()/jet->P4().E() > .9) return true;
-}
-}
-for(int i = 0; i < photonvec.size(); ++i){
-if(jet->P4().DeltaR(photonvec[i].P4()) < .4)
-{
-if(photonvec[i].P4().E()/jet->P4().E() > .9)
-{//cout << " photon: deltar " << jet->P4().DeltaR(photonvec[i].P4()) << ", energy fraction " << photonvec[i].P4().E()/jet->P4().E() <<  endl; 
- return true;
-}
-}
-}
-
-return false; //if false is returned, jet shouldn't be removed
-
-}//end of jetremove()
 
 bool METMHTAsys(string PileUp ,MissingET* met,vector<Jet> jetvec,vector<Muon> muonvec,vector<Electron> electronvec,vector<Photon> photonvec){
 double Met=-99;
@@ -255,7 +222,9 @@ Met= PUCorMet.Mod();
 RawMet.SetMagPhi(met->MET, met->Phi);
 
 METAsys=fabs(Met-(RawMet.Mod()))/(Met+(RawMet.Mod()));//this is funny. RawMet.Mod() must return met->MET. We didn't need to build RawMet to obtain its magnitude :):0
-
+//cout << "......................RawMet.Mod(): " << RawMet.Mod() << endl;
+//cout << "...................... Met: " << Met << endl; 
+//cout << "...................... METAsys: " << METAsys << endl;
 return METAsys < AsysCut;
 }
 
@@ -271,7 +240,7 @@ float xs, xserr;
 double weight, CrossSection, CrossSectionError, totPx, totPy, HT, MHT, cutHT, cutMHT, pt, coss, sinn;
 vector<vector<double> > vecjvec, vecelecvec, vecmuvec;
 vector<double> jvec, elecvec, muvec;
-vector<GenParticle*> GenParticlevec;
+vector<GenParticle> GenParticlevec;
 vector<TH1D > vec;
 vector<Photon> photonvec; vector< Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
 char TreeList[200], tempname[200];
@@ -293,7 +262,7 @@ TClonesArray * branchPhoton;
 TClonesArray * branchMet;
 TClonesArray * branchHT;
 TClonesArray * branchParticle;
-
+TLorentzVector tempLorvec;
 
 
 
@@ -361,7 +330,9 @@ cutname[13]="RA2_Asys_allbutMHT1000";
 for(int i=0; i< cutname.size();i++){
 cut_histvec_map[cutname[i]]=vec;
 }
-
+////
+if(METMHTAsys(Pileup,met,jetvec,muonvec,electronvec,photonvec)){} else {}
+///
 //initialize a map between string and maps. copy the map of histvecs into each
 map_map["allEvents"]=cut_histvec_map;map_map["W"]=cut_histvec_map;map_map["Wlv"]=cut_histvec_map;map_map["Wjj"]=cut_histvec_map;map_map["Z"]=cut_histvec_map;map_map["Zll"]=cut_histvec_map; map_map["Zvv"]=cut_histvec_map;map_map["Zjj"]=cut_histvec_map;map_map["photon"]=cut_histvec_map;map_map["H"]=cut_histvec_map; 
 
@@ -430,7 +401,7 @@ cout << "the total number of events: " << treeReader->GetEntries() << endl;
 
 //Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events/
 //for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
-for(int entry = 0; entry < 5000; entry++){
+for(int entry = 0; entry < 10; entry++){
 treeReader->ReadEntry(entry);
 
 //met and sht
@@ -439,7 +410,7 @@ sht= (ScalarHT*) branchHT->At(0);
 
 
 //Set Weight
-LHEFEvent* event = (LHEFEvent*) branchEvent->At(0);
+LHEFEvent* event = (LHEFEvent*) branchEvent->At(0);//->At(1) and higher there in nothing. There is no point to make a vector.
 weight= event->Weight;
 
 //a counter
@@ -452,14 +423,15 @@ for (int i = 0; i < branchParticle->GetEntries(); ++i)
   {
 ///define a pointer of class GenParticle and point it to the "entry"th event in the branch particle. Hence, we have access to PID, status and other properties of the particles in the event. 
 GenParticle * particle = (GenParticle*)branchParticle->At(i);
-GenParticlevec.push_back(particle);
+GenParticlevec.push_back(*particle);
 }//end of loop over "particles in history" 
 
 //////////////////loop over photons and load them to a vector
+photonvec.clear();
 for (int i = 0; i < branchPhoton->GetEntries(); ++i)
   {
     Photon* pho = (Photon*)branchPhoton->At(i);
-    if (fabs(pho->Eta) > 5)
+    if (fabs(pho->Eta) > 5) 
       continue;
     photonvec.push_back(*pho);
   }
@@ -471,8 +443,9 @@ elecvec.clear();
 vecelecvec.clear();
 for(int elecn=0; elecn <branchElectron->GetEntries();elecn++)
 {
-
 Electron* elec = (Electron*) branchElectron->At(elecn);
+electronvec.push_back(*elec);
+
 ///for HT we want events with all elecs pt > 10 and |eta|< 2.5
 if(elec->PT > 10 && elec->Eta < 2.5 && elec->Eta > (-2.5))
 {
@@ -482,7 +455,6 @@ elecvec.push_back(elec->PT);
 elecvec.push_back((double)elec->Phi);
 elecvec.push_back((double)elec->Eta);
 vecelecvec.push_back(elecvec);
-electronvec.push_back(*elec);
 /// end of if over pt and eta for HT
 } 
 ////end of loop over electrons
@@ -494,8 +466,9 @@ muvec.clear();
 vecmuvec.clear();
 for(int mun=0; mun <branchMuon->GetEntries();mun++)
 {
-
 Muon* mu = (Muon*) branchMuon->At(mun);
+muonvec.push_back(*mu);
+
 ///for HT we want events with all muons pt > 10 and |eta|< 2.4
 if(mu->PT > 10 && mu->Eta < 2.4 && mu->Eta > (-2.4))
 {
@@ -505,7 +478,6 @@ muvec.push_back(mu->PT);
 muvec.push_back((double)mu->Phi);
 muvec.push_back((double)mu->Eta);
 vecmuvec.push_back(muvec);
-muonvec.push_back(*mu);
 /// end of if over pt and eta for HT
 }
 ////end of loop over muons
@@ -518,15 +490,57 @@ HT=0;
 jetvec.clear();
 vecjvec.clear();
 jvec.clear();
+//cout << " ...............................................branchJet->GetEntries() " << branchJet->GetEntries() << endl;
 for(int jetn=0; jetn <branchJet->GetEntries();jetn++){
+
+tempLorvec.SetPxPyPzE(0,0,0,0);
+
 Jet* jet = (Jet*) branchJet->At(jetn);
+
+////////////////////////////Modifying-Removing some Jets
+//Reference Ben
+//  --> Matching jet and lepton in the eta-phi plane. In case of matched,
+//  compare the energy fraction: 
+//  * fraction > 90% (mostly jet from the lepton), remove this jet
+//  * fraction < 90%: additional energy from pileup, just correct this jet by
+//  removing the lepton energy
+for (int i = 0; i < muonvec.size(); ++i){
+    Muon muon = muonvec.at(i);
+if (jet->P4().DeltaR(muon.P4()) < 0.4){tempLorvec += muon.P4();}
+}
+
+for (int i = 0; i < electronvec.size(); ++i){
+    Electron elec = electronvec.at(i);
+if (jet->P4().DeltaR(elec.P4()) < 0.4){tempLorvec += elec.P4();}
+}
+
+for (int i = 0; i < photonvec.size(); ++i){
+    Photon pho = photonvec.at(i);
+if (jet->P4().DeltaR(pho.P4()) < 0.4){tempLorvec += pho.P4();}
+}
+if((tempLorvec.E() )/( jet->P4().E() ) > 0.9){continue;}
+if((tempLorvec.E() )/( jet->P4().E() ) < 0.9 && (tempLorvec.E() )/( jet->P4().E() ) > 0.0){ cout << " <.4 and > 0.9 " << endl;
+// Projection of the tempLorvec in the 
+//jet direction is  
+// (\vec{jet}.\vec{temp})/(\vec{jet}.\vec{jet})*\vec{jet}
+//now we use tempLorvec as the projected vector
+tempLorvec = (jet->P4().Dot(tempLorvec))/(jet->P4().Dot(jet->P4())) * jet->P4();  
+
+jet->P4() = jet->P4() - tempLorvec;
+jet->PT  =  jet->P4().Pt();
+jet->Eta =  jet->P4().Eta();
+jet->Phi  = jet->P4().Phi();
+jet->Mass = jet->P4().M();
+
+}
+
 sinn = (double) sin(jet->Phi);
 coss = (double) cos(jet->Phi);
 pt = jet->PT;
 jetvec.push_back(*jet);
 
 ///for HT we want events with all jets pt > 50 and |eta|< 2.5
-//if(pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5) && jetremove(jet,muonvec,electronvec,photonvec)==false)
+//if(jetremove(jet,muonvec,electronvec,photonvec)==false && pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5))
 if(pt>50 && jet->Eta < 2.5 && jet->Eta > (-2.5))
 {
 //the zeroth component is the tag of the jet/first:pt /second:phi/third:eta
