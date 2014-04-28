@@ -36,7 +36,8 @@ map<string, map<string , vector<TH1D> > > map_map; //here the string shows the t
 vector< map<string, map<string , vector<TH1D> > >  > vec_map_map; //this is a vector of previous map. Each component of the vector corresponds to one HTbin. 
                                                                   //In BJ case there are 7 of them.
 TFile * file;
-TH1D  temphist;
+TH1D temphist;
+vector<TH1D > vtemphist;
 vector<TH1D > temphistvec;
 THStack * tempstack;
 TDirectory *cdtoitt;
@@ -61,8 +62,7 @@ for(int i=1; i<=7 ; i++){
 sprintf(tempname,"../../BgAnalysisV2/Results/results_PhaseI_BJ_14TEV_HT%d_NoPileUp_00.root",i);
 file = new TFile(tempname, "R");
 sprintf(tempname,"allEvents/RA2nocut/allEvents_RA2nocut_hist1");
-temphist =* (TH1D* ) file->Get(tempname);
-tempvalue = (luminosity*xs_vec[i])/(temphist.GetEntries());
+tempvalue = (luminosity*xs_vec[i-1])/((* (TH1D* ) file->Get(tempname)).GetEntries());
 scalevec.push_back(tempvalue);
 }//end of loop over HTbins 1..7
 
@@ -77,11 +77,13 @@ file = new TFile(tempname, "R");
 for(map<int , string >::iterator itt=type.begin(); itt!=type.end();itt++){
 for(map<int , string >::iterator it=cutname.begin(); it!=cutname.end();it++){
 temphistvec.clear();
+vtemphist.clear();
 for(int j=0; j<=3; j++){
 sprintf(tempname,"%s/%s/%s_%s_hist%d",(itt->second).c_str(),(it->second).c_str(),(itt->second).c_str(),(it->second).c_str(),j);
-temphist = *(TH1D* ) file->Get(tempname);
-//temphist.Scale(scalevec[i]);//scale the hists before loading them 
-temphistvec.push_back(temphist);
+//sprintf(tempname,"allEvents/RA2nocut/allEvents_RA2nocut_hist%d",j);
+vtemphist.push_back(*(TH1D* ) file->Get(tempname));
+vtemphist.back().Scale(scalevec[i-1]);//scale the hists before loading them 
+temphistvec.push_back(vtemphist.back());
 }//end of loop over j=0..3
 map_map[itt->second][it->second]=temphistvec;
 }//end of loop over map
@@ -90,6 +92,7 @@ vec_map_map.push_back(map_map);
 }//end of loop over HTbins 1..7
 
 tempstack = new THStack("stack","Binned Sample Stack");
+
 
 file = new TFile("stack.root","RECREATE");
 //stack all 7 HTbins 
@@ -104,10 +107,13 @@ for(int j=0; j<=3; j++){
 for(int i=0; i<7 ; i++){
 
 //cout << "i " << i << " j " << j << " itt->second " << itt->second << " it->second " << it->second << endl;
-tempstack->Add( & vec_map_map[i][itt->second][it->second][j]);
+temphist = vec_map_map[i][itt->second][it->second][j];
+tempstack->Add( & temphist);
 }//end of loop over HTbins 1..7
 sprintf(tempname,"%s_%s_hist%d",(itt->second).c_str(),(it->second).c_str(),j);
 tempstack->Write(tempname);
+delete tempstack;
+tempstack = new THStack("stack","Binned Sample Stack");
 }//end of loop over j=0..3
 }//end of loop over map
 }//end of loop over map
