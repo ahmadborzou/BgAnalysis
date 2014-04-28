@@ -400,8 +400,8 @@ branchParticle = treeReader->UseBranch("Particle");
 cout << "the total number of events: " << treeReader->GetEntries() << endl; 
 
 //Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events//Loop Over all Events/
-//for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
-for(int entry = 0; entry < 10; entry++){
+for(int entry = 0; entry < treeReader->GetEntries() ; entry++ ){
+//for(int entry = 0; entry < 20000; entry++){
 treeReader->ReadEntry(entry);
 
 //met and sht
@@ -455,6 +455,7 @@ elecvec.push_back(elec->PT);
 elecvec.push_back((double)elec->Phi);
 elecvec.push_back((double)elec->Eta);
 vecelecvec.push_back(elecvec);
+elecvec.clear();
 /// end of if over pt and eta for HT
 } 
 ////end of loop over electrons
@@ -478,6 +479,7 @@ muvec.push_back(mu->PT);
 muvec.push_back((double)mu->Phi);
 muvec.push_back((double)mu->Eta);
 vecmuvec.push_back(muvec);
+muvec.clear();
 /// end of if over pt and eta for HT
 }
 ////end of loop over muons
@@ -519,7 +521,7 @@ for (int i = 0; i < photonvec.size(); ++i){
 if (jet->P4().DeltaR(pho.P4()) < 0.4){tempLorvec += pho.P4();}
 }
 if((tempLorvec.E() )/( jet->P4().E() ) > 0.9){continue;}
-if((tempLorvec.E() )/( jet->P4().E() ) < 0.9 && (tempLorvec.E() )/( jet->P4().E() ) > 0.0){ cout << " <.4 and > 0.9 " << endl;
+if((tempLorvec.E() )/( jet->P4().E() ) < 0.9 && (tempLorvec.E() )/( jet->P4().E() ) > 0.0){
 // Projection of the tempLorvec in the 
 //jet direction is  
 // (\vec{jet}.\vec{temp})/(\vec{jet}.\vec{jet})*\vec{jet}
@@ -549,6 +551,7 @@ jvec.push_back(pt);
 jvec.push_back((double)jet->Phi);
 jvec.push_back((double)jet->Eta);
 vecjvec.push_back(jvec);
+jvec.clear();
 ///calculate HT
 HT+=pt;
 /// end of if over pt and eta for HT
