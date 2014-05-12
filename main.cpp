@@ -313,7 +313,7 @@ class mainClass{
   vector<GenParticle> GenParticlevec;
   //KH
   vector<TH1D> vecTH;  //KH vec-->vecTH
-  vector<Photon> photonvec; vector<Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
+  vector<Photon> photonvec,phovec; vector<Electron> electronvec; vector<Muon> muonvec;vector<Jet> jetvec; 
   char TreeList[200], tempname[200];
   string pro, line, Pileup_ ;
   map<int, string> cutname;
@@ -342,6 +342,7 @@ class mainClass{
   bool mht(){if(MHT>=200)return true; return false;}
   bool dphi(){if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.5 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)return true; return false;}
   bool nolep(){if(vecelecvec.size()==0 && vecmuvec.size()==0)return true; return false;}
+  bool nopho(){if(phovec.size()==0)return true; return false;}
   bool fourjet(){if(vecjvec.size() >= 4)return true; return false;}
   bool fivejet(){if(vecjvec.size() >= 5)return true; return false;}
   bool sixjet(){if(vecjvec.size() >= 6)return true; return false;}
@@ -361,15 +362,13 @@ class mainClass{
     if(ss== cutname[4]) {if(Asys()&&threejet()&&ht()&&mht())return true;}
     if(ss== cutname[5]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi())return true;}
     if(ss== cutname[6]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep())return true;}
-    if(ss== cutname[7]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&fourjet())return true;}
-    if(ss== cutname[8]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&fivejet())return true;}
-    if(ss== cutname[9]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet())return true;}
-    if(ss== cutname[10]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highMht())return true;}
-    if(ss== cutname[11]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt())return true;}
-    if(ss== cutname[12]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt()&&highMht())return true;}
-
-    if(ss== cutname[13]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highMht()&&Asys())return true;}
-    if(ss== cutname[14]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&sixjet()&&highHt()&&Asys())return true;}
+    if(ss== cutname[7]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho())return true;}
+    if(ss== cutname[8]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet())return true;}
+    if(ss== cutname[9]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet())return true;}
+    if(ss== cutname[10]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet())return true;}
+    if(ss== cutname[11]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highMht())return true;}
+    if(ss== cutname[12]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highHt())return true;}
+    if(ss== cutname[13]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highHt()&&highMht())return true;}
 
     return false; 
   }
@@ -411,21 +410,17 @@ public:
     cutname[4]="RA2MHT200cut";
     cutname[5]="RA2delphicut";
     cutname[6]="RA2noleptoncut";
-    cutname[7]="RA2Inc4Jetcut";
-    cutname[8]="RA2Inc5Jetcut";
-    cutname[9]="RA2Inc6Jetcut";
-    cutname[10]="RA2allbutHT2500cut";
-    cutname[11]="RA2allbutMHT1000cut";
-    cutname[12]="RA2allcut";
-    cutname[13]="RA2_Asys_allbutHT2500";
-    cutname[14]="RA2_Asys_allbutMHT1000";
-    for(int i=0; i< cutname.size();i++){
+    cutname[7]="noPhotoncut";
+    cutname[8]="RA2Inc4Jetcut";
+    cutname[9]="RA2Inc5Jetcut";
+    cutname[10]="RA2Inc6Jetcut";
+    cutname[11]="RA2allbutHT2500cut";
+    cutname[12]="RA2allbutMHT1000cut";
+    cutname[13]="RA2allcut";
+     for(int i=0; i< cutname.size();i++){
       cut_histvec_map[cutname[i]]=vecTH;
     }
 
-    //
-    ////
-    if(METMHTAsys(Pileup,met,jetvec,muonvec,electronvec,photonvec)){} else {}
 
     ///
     //initialize a map between string and maps. copy the map of histvecs into each
@@ -566,6 +561,16 @@ if(desirednumeve != -999 ){if(desirednumeve < treeReader->GetEntries()) break;}
 	    continue;
 	  photonvec.push_back(*pho);
 	}
+
+///here we load photons to another vector for another study
+phovec.clear();
+      for (int i = 0; i < branchPhoton->GetEntries(); ++i)
+        {
+          Photon* pho = (Photon*)branchPhoton->At(i);
+          if (pho->PT < 30)
+            continue;
+          phovec.push_back(*pho);
+        }
       /////////////////end of loop over photons
       
       ////loop over electrons (load them to a vector)
@@ -846,10 +851,10 @@ int main()
 //mainClass mainObj5_BJ("NoPileUp","BJ_14TEV_HT5","PhaseI", "Results","00");
 //mainClass mainObj6_BJ("NoPileUp","BJ_14TEV_HT6","PhaseI", "Results","00");
 //mainClass mainObj7_BJ("NoPileUp","BJ_14TEV_HT7","PhaseI", "Results","00");
-mainClass mainObj1_TT("NoPileUp","TT_14TEV_HT1","PhaseI", "Results","00");
-mainClass mainObj2_TT("NoPileUp","TT_14TEV_HT2","PhaseI", "Results","00");
-mainClass mainObj3_TT("NoPileUp","TT_14TEV_HT3","PhaseI", "Results","00");
-mainClass mainObj4_TT("NoPileUp","TT_14TEV_HT4","PhaseI", "Results","00");
+//mainClass mainObj1_TT("NoPileUp","TT_14TEV_HT1","PhaseI", "Results","00");
+//mainClass mainObj2_TT("NoPileUp","TT_14TEV_HT2","PhaseI", "Results","00");
+//mainClass mainObj3_TT("NoPileUp","TT_14TEV_HT3","PhaseI", "Results","00");
+//mainClass mainObj4_TT("NoPileUp","TT_14TEV_HT4","PhaseI", "Results","00");
 mainClass mainObj5_TT("NoPileUp","TT_14TEV_HT5","PhaseI", "Results","00");
 
 return 0;
