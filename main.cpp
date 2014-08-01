@@ -469,7 +469,7 @@ public:
      CrossSection=-999.0; CrossSectionError=0.0; totPx=0;desirednumeve=-999; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
   
     /////Here you should determine howmany events you need. If you need all the events, please comment this out. 
-    //  desirednumeve = 1000;
+      //desirednumeve = 1000;
   
     TChain chain("Delphes");
     // Create object of class ExRootTreeReader
@@ -622,7 +622,7 @@ eventType[1]="glgl";
     //
     //Add the root files to a chain called Delphes
     sprintf(TreeList,"./FileList/%s/%s_%s_%s",Detector.c_str(),Process.c_str(),Pileup.c_str(),inputnumber.c_str());
-if(Process.find("_HT")!=string::npos){input.open(TreeList,std::fstream::in);}//use this when running on Background. 
+if(Process.find("_HT")!=string::npos || Process.find("StauC")!=string::npos){input.open(TreeList,std::fstream::in);}//use this when running on Background. 
 else{ if(!input.is_open()){sprintf(TreeList,"./FileList/%s/%s_%s.list",Detector.c_str(),Process.c_str(),Pileup.c_str());input.open(TreeList,std::fstream::in);}} ///use this line if running on signal or a file with *.list suffix.
     cout << "file name " << TreeList << endl; 
 //reset the chain before loading the TTrees    
