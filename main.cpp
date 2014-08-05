@@ -15,6 +15,7 @@ To change the output histograms one need to first determine how many of them exi
 
 */
 
+
 #include <cassert>
 #include "TChain.h"
 #include "TH1.h"
@@ -38,7 +39,7 @@ To change the output histograms one need to first determine how many of them exi
 
 using namespace std;
 
-//
+
 class histClass{
   double * a;
   TH1D * b_hist;
@@ -47,7 +48,7 @@ public:
     a = eveinfarr_;
     b_hist=hist_;
     (*b_hist).Fill(*a);
-    for(int i=1; i<=17 ; i++){
+    for(int i=1; i<=22; i++){
       (*(b_hist+i)).Fill(*(a+i),*a);
     }
   }
@@ -65,7 +66,7 @@ double delphi(vector<double> a, double tPx, double tPy,double mht){
   ///end of function deltaphi
 }
 
-//
+
 //this function is exclusively written for BJ processes with emphesis on one B.
 bool bg_type(string bg_ ,vector<GenParticle> pvec){
 
@@ -269,15 +270,14 @@ bool bg_type(string bg_ ,vector<GenParticle> pvec){
       if(p->M1 < GenSize && p->M2 < GenSize
          && (abs(p->PID) == 11 || abs(p->PID) == 13 || abs(p->PID) == 15)) lepvec.push_back(*p);
     }
-    //now modify lepton vector
+  //now modify lepton vector
     if((int)lepvec.size()==2){
       if(lepvec.at(0).P4().DeltaR(lepvec.at(1).P4())<=0.8) lepvec.erase(lepvec.begin()+1);
     }
     if(numofT==2 && (int)lepvec.size()==0) return true;
     return false;
   }//end of TTdiLep
-
-
+/*
 if(bg_=="glgl"){
 int Ngo=0;
 for(int i = 0; i < (int)(pvec.size()); ++i){
@@ -288,39 +288,59 @@ if(Ngo==2){return true;}
 return false;
 }
 
+if(bg_=="n2n2"){
+int Nn2 = 0;
+for(int i = 0; i < (int)(pvec.size()); ++i){
+GenParticle * particle = &pvec.at(i);
+if(particle->PID==1000023){Nn2++;}
+}//end of for
+if(Nn2==2){return true;}
+return false;
+}
+
+if(bg_=="c1n2"){
+int Nn2 = 0, Nc1=0;
+for(int i = 0; i < (int)(pvec.size()); ++i){
+GenParticle * particle = &pvec.at(i);
+if (abs(particle->PID)==1000024) Nc1++;
+if(particle->PID==1000023){Nn2++;}
+}//end of for
+if(Nc1==1&&Nn2==1){return true;}
+return false;
+}
+
+if(bg_=="c1c1"){
+int Nc1=0;
+for(int i = 0; i < (int)(pvec.size()); ++i){
+GenParticle * particle = &pvec.at(i);
+if (abs(particle->PID)==1000024) Nc1++;
+}//end of for
+if(Nc1==2){return true;}
+return false;
+}
+
+if(bg_=="t1t1"){
+int Nt1=0;
+for(int i = 0; i < (int)(pvec.size()); ++i){
+GenParticle * particle = &pvec.at(i);
+if (abs(particle->PID)==1000006) Nt1++;
+}//end of for
+if(Nt1==2){return true;}
+return false;
+}
+
+if(bg_=="b1b1"){
+int Nb1=0;
+for(int i = 0; i < (int)(pvec.size()); ++i){
+GenParticle * particle = &pvec.at(i);
+if (abs(particle->PID)==1000005) Nb1++;
+}//end of for
+if(Nb1==2){return true;}
+return false;
+}*/
 } //end of function bg_type
-/*    glgl = false;
-      sqgl = false;
-      c1c1 = false;
-      c1n2 = false;
-      n2n2 = false;
-      t1t1 = false;
-      Ngo  = 0;
-      Nc1  = 0;
-      Nn2  = 0;
-      Nt1  = 0; 
-      vecTopQuarks.clear();*/
-/*          if (particle->PID==1000021) sqgl = true;
-          if (abs(particle->PID)==1000001) sqgl = true;
-          if (abs(particle->PID)==1000002) sqgl = true;
-          if (abs(particle->PID)==1000003) sqgl = true;
-          if (abs(particle->PID)==1000004) sqgl = true;
-          if (particle->PID==1000021) Ngo++;
-          if (abs(particle->PID)==1000023) Nn2++;
-          if (abs(particle->PID)==1000024) Nc1++;
-          if (abs(particle->PID)==1000006) Nt1++;
-          if (abs(particle->PID)==6) vecTopQuarks.push_back(*particle); 
-      if (Ngo==2){
-        glgl = true;
-      } else if (Nn2==2){
-        n2n2 = true;
-      } else if (Nc1==1&&Nn2==1){
-        c1n2 = true;
-      } else if (Nc1==2){
-        c1c1 = true;
-      } else if (Nt1==2){
-        t1t1 = true;
-      }*/
+
+
 //
 double  METMHTAsys(MissingET* met,vector<Jet> jetvec,vector<Muon> muonvec,vector<Electron> electronvec,vector<Photon> photonvec){
   double Met=-99;
@@ -345,8 +365,17 @@ double  METMHTAsys(MissingET* met,vector<Jet> jetvec,vector<Muon> muonvec,vector
   //cout << "...................... Met: " << Met << endl; 
   //cout << "...................... METAsys: " << METAsys << endl;
   return METAsys;
-
 }
+
+//is this particle a SUSY particle or not?
+bool isSusy(int pid) {
+   pid = std::abs(pid); //just in case
+  if (pid>=1000001 && pid<=1000039) return true;
+  if (pid>=2000001 && pid<=2000039) return true;
+  //indices only go up to 2000015 but going to 39 seems ok too
+  return false;
+}
+
 
 ///////////////////////////////////////////
 //Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()//Begining of the main()
@@ -355,10 +384,11 @@ class mainClass{
 
   //List of variables
   int terminator, desirednumeve;
+  int stst,sqsq,sbsb,slsl,glgl,ewew,glsq,othersusy;
   float xs, xserr;
   double weight, CrossSection, CrossSectionError, totPx, totPy, HT, MHT, cutHT, cutMHT, pt, coss, sinn;
   vector<vector<double> > vecjvec, vecelecvec, vecmuvec;
-  vector<TLorentzVector> vecJets, vecBtagLoose, vecBtagTight;
+  vector<TLorentzVector> vecJets, vecBtagLoose, vecBtagTight, vecGenBottom;
   vector<double> jvec, elecvec, muvec;
   vector<Jet*> tauvec;
   vector<GenParticle> GenParticlevec;
@@ -391,39 +421,29 @@ class mainClass{
   TClonesArray * branchParticle;
   TLorentzVector tempLorvec;
 
-/*
-  bool sqgl;
-  bool glgl;
-  bool c1c1;
-  bool c1n2;
-  bool n2n2;
-  bool t1t1;
-  int Ngo;
-  int Nc1;
-  int Nn2;
-  int Nt1;
-  int Ntop;
-*/
-
   //define different cuts here
   bool threejet(){if(vecjvec.size() >= 3 && vecjvec[0][1]> 50 )return true; return false;}
   bool twoloosebtag(){if(vecBtagLoose.size() >= 2)return true; return false;}
   bool twotightbtag(){if(vecBtagTight.size() >= 2)return true; return false;}
   bool ht(){if(HT>=1000) return true; return false;}
+bool ht1500(){if(HT>=1500) return true; return false;}  
+bool ht2000(){if(HT>=2000) return true; return false;}
+bool ht2500(){if(HT>=2500) return true; return false;}
   bool mht(){if(MHT>=500)return true; return false;}
+  bool mht700(){if(MHT>=700)return true; return false;}
+  bool mht800(){if(MHT>=800)return true; return false;}
+  bool mht1000(){if(MHT>=1000)return true; return false;}
   bool dphi(){if(delphi(vecjvec[0],totPx,totPy,MHT)>0.5 && delphi(vecjvec[1],totPx,totPy,MHT)>0.5 && delphi(vecjvec[2],totPx,totPy,MHT)>0.3)return true; return false;}
   bool nolep(){if(vecelecvec.size()==0 && vecmuvec.size()==0)return true; return false;}
   bool nopho(){if(phovec.size()==0)return true; return false;}
   bool fourjet(){if(vecjvec.size() >= 4)return true; return false;}
   bool fivejet(){if(vecjvec.size() >= 5)return true; return false;}
   bool sixjet(){if(vecjvec.size() >= 6)return true; return false;}
-  bool highMht(){if(MHT>=1000)return true; return false;}
-  bool highHt(){if(HT>=2500)return true; return false;}
   //Reference: Ben
   //there are jets missing in the event, which cause much larger MHT than expected. In order to supress this problem,
   bool Asys(){
-double AsysCut = -99;
- if (Pileup_ == "NoPileUp") AsysCut = 0.2;
+  double AsysCut = -99;
+  if (Pileup_ == "NoPileUp") AsysCut = 0.2;
   if (Pileup_ == "50PileUp") AsysCut = 0.3;
   if (Pileup_ == "140PileUp") AsysCut = 0.5;
   assert(AsysCut != -99.);
@@ -443,33 +463,92 @@ if(METMHTAsys(met,jetvec,muonvec,electronvec,photonvec) < AsysCut )return true; 
     if(ss== cutname[8]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet())return true;}
     if(ss== cutname[9]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet())return true;}
     if(ss== cutname[10]) {if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet())return true;}
-    if(ss== cutname[11]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highMht())return true;}
-    if(ss== cutname[12]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highHt())return true;}
-    if(ss== cutname[13]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highHt()&&highMht())return true;}
-    if(ss== cutname[14]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&highMht())return true;}
+    if(ss== cutname[11]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&mht1000())return true;}
+    if(ss== cutname[12]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2500())return true;}
+    if(ss== cutname[13]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2500()&&mht1000())return true;}
+    if(ss== cutname[14]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&mht1000())return true;}
     if(ss== cutname[15]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag())return true;}
-    if(ss== cutname[16]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&highMht())return true;}    
-    if(ss== cutname[17]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&highMht())return true;}
+    if(ss== cutname[16]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&mht1000())return true;}    
+    if(ss== cutname[17]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&mht1000())return true;}
     if(ss== cutname[18]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag())return true;}
-    if(ss== cutname[19]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&highMht()&&twoloosebtag())return true;}
-    if(ss== cutname[20]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&highMht())return true;}
+    if(ss== cutname[19]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&mht1000()&&twoloosebtag())return true;}
+    if(ss== cutname[20]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&mht1000())return true;}
     if(ss== cutname[21]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag())return true;}
-    if(ss== cutname[22]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&highMht()&&twoloosebtag())return true;}
-    if(ss== cutname[23]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highMht())return true;}
+    if(ss== cutname[22]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&mht1000()&&twoloosebtag())return true;}
+    if(ss== cutname[23]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&mht1000())return true;}
     if(ss== cutname[24]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag())return true;}
-    if(ss== cutname[25]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&highMht()&&twoloosebtag())return true;}
+    if(ss== cutname[25]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&mht1000()&&twoloosebtag())return true;}
+    if(ss== cutname[26]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht1500())return true;}
+    if(ss== cutname[27]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht2000())return true;}
+    if(ss== cutname[28]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht2500())return true;}
+    if(ss== cutname[29]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[30]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[31]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[32]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&ht2500()&&mht1000())return true;}
+    if(ss== cutname[33]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht1500())return true;}
+    if(ss== cutname[34]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht2000())return true;}
+    if(ss== cutname[35]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht2500())return true;}
+    if(ss== cutname[36]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[37]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[38]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[39]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&twoloosebtag()&&ht2500()&&mht1000())return true;}
+
+    if(ss== cutname[40]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht1500())return true;}
+    if(ss== cutname[41]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht2000())return true;}
+    if(ss== cutname[42]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht2500())return true;}
+    if(ss== cutname[43]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[44]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[45]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[46]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&ht2500()&&mht1000())return true;}
+    if(ss== cutname[47]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht1500())return true;}
+    if(ss== cutname[48]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht2000())return true;}
+    if(ss== cutname[49]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht2500())return true;}
+    if(ss== cutname[50]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[51]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[52]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[53]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fourjet()&&twoloosebtag()&&ht2500()&&mht1000())return true;}
+
+    if(ss== cutname[54]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht1500())return true;}
+    if(ss== cutname[55]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht2000())return true;}
+    if(ss== cutname[56]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht2500())return true;}
+    if(ss== cutname[57]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[58]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[59]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[60]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&ht2500()&&mht1000())return true;}
+    if(ss== cutname[61]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht1500())return true;}
+    if(ss== cutname[62]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht2000())return true;}
+    if(ss== cutname[63]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht2500())return true;}
+    if(ss== cutname[64]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[65]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[66]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[67]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&fivejet()&&twoloosebtag()&&ht2500()&&mht1000())return true;}
+
+    if(ss== cutname[68]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht1500())return true;}
+    if(ss== cutname[69]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2000())return true;}
+    if(ss== cutname[70]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2500())return true;}
+    if(ss== cutname[71]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[72]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[73]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[74]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&ht2500()&&mht1000())return true;}
+    if(ss== cutname[75]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht1500())return true;}
+    if(ss== cutname[76]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht2000())return true;}
+    if(ss== cutname[77]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht2500())return true;}
+    if(ss== cutname[78]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht1500()&&mht700())return true;}
+    if(ss== cutname[79]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht2000()&&mht800())return true;}
+    if(ss== cutname[80]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht2000()&&mht1000())return true;}
+    if(ss== cutname[81]){if(Asys()&&threejet()&&ht()&&mht()&&dphi()&&nolep()&&nopho()&&sixjet()&&twoloosebtag()&&ht2500()&&mht1000())return true;}
 
 return false; 
   }
 
 //constructor
 public:
-  mainClass(string Pileup, string Process, string Detector, string Outdir, string inputnumber){
-    Pileup_ = Pileup;
-     CrossSection=-999.0; CrossSectionError=0.0; totPx=0;desirednumeve=-999; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
-  
+mainClass(string Pileup, string Process, string Detector, string Outdir, string inputnumber){
+Pileup_ = Pileup;
+CrossSection=-999.0; CrossSectionError=0.0; totPx=0;desirednumeve=-999; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
+stst=0;sqsq=0;sbsb=0;slsl=0;glgl=0;ewew=0;glsq=0;othersusy=0;
     /////Here you should determine howmany events you need. If you need all the events, please comment this out. 
-      //desirednumeve = 1000;
+//      desirednumeve = 1000;
   
     TChain chain("Delphes");
     // Create object of class ExRootTreeReader
@@ -484,6 +563,18 @@ public:
     vecTH.push_back(RA2MHT_hist);
     TH1D  RA2NJet_hist = TH1D("NJet","Number of Jets Distribution",20,0,20);
     vecTH.push_back(RA2NJet_hist);
+///Bottom quark
+    TH1D  NBottom_hist = TH1D("NBottom","Number of bottom quarks Distribution",20,0,20);
+    vecTH.push_back(NBottom_hist);
+    TH1D  Bottom1Pt_hist =  TH1D("Bottom1Pt","First bottom Pt Distribution",50,0,200);
+    vecTH.push_back(Bottom1Pt_hist);
+    TH1D  Bottom1Eta_hist = TH1D("Bottom1Eta","Eta of the first bottom",100,-5,5);
+    vecTH.push_back(Bottom1Eta_hist);
+    TH1D  Bottom2Pt_hist =  TH1D("Bottom2Pt","Second bottom Pt Distribution",50,0,200);
+    vecTH.push_back(Bottom2Pt_hist);
+    TH1D  Bottom2Eta_hist = TH1D("Bottom2Eta","Eta of the second bottom",100,-5,5);
+    vecTH.push_back(Bottom2Eta_hist);
+//////////////////
     TH1D  RA2NBtagLoose_hist = TH1D("NBtagLoose","Number of BtagLoose Distribution",20,0,20);
     vecTH.push_back(RA2NBtagLoose_hist);
     TH1D  RA2NBtagTight_hist = TH1D("NBtagTight","Number of BtagTight Distribution",20,0,20);
@@ -548,6 +639,67 @@ public:
     cutname[23]="RA2Inc6JetcutMHT1000";
     cutname[24]="RA2Inc6JetcutBtag2";
     cutname[25]="RA2Inc6JetcutBtag2MHT1000";
+cutname[26]="RA2noleptoncutht1500";
+cutname[27]="RA2noleptoncutht2000";
+cutname[28]="RA2noleptoncutht2500";
+cutname[29]="RA2noleptoncutht1500mht700";
+cutname[30]="RA2noleptoncutht2000mht800";
+cutname[31]="RA2noleptoncutht2000mht1000";
+cutname[32]="RA2noleptoncutht2500mht1000";
+cutname[33]="RA2noleptoncutbtag2ht1500";
+cutname[34]="RA2noleptoncutbtag2ht2000";
+cutname[35]="RA2noleptoncutbtag2ht2500";
+cutname[36]="RA2noleptoncutbtag2ht1500mht700";
+cutname[37]="RA2noleptoncutbtag2ht2000mht800";
+cutname[38]="RA2noleptoncutbtag2ht2000mht1000";
+cutname[39]="RA2noleptoncutbtag2ht2500mht1000";
+
+cutname[40]="RA2Inc4Jetcutht1500";
+cutname[41]="RA2Inc4Jetcutht2000";
+cutname[42]="RA2Inc4Jetcutht2500";
+cutname[43]="RA2Inc4Jetcutht1500mht700";
+cutname[44]="RA2Inc4Jetcutht2000mht800";
+cutname[45]="RA2Inc4Jetcutht2000mht1000";
+cutname[46]="RA2Inc4Jetcutht2500mht1000";
+cutname[47]="RA2Inc4Jetcutbtag2ht1500";
+cutname[48]="RA2Inc4Jetcutbtag2ht2000";
+cutname[49]="RA2Inc4Jetcutbtag2ht2500";
+cutname[50]="RA2Inc4Jetcutbtag2ht1500mht700";
+cutname[51]="RA2Inc4Jetcutbtag2ht2000mht800";
+cutname[52]="RA2Inc4Jetcutbtag2ht2000mht1000";
+cutname[53]="RA2Inc4Jetcutbtag2ht2500mht1000";
+
+cutname[54]="RA2Inc5Jetcutht1500";
+cutname[55]="RA2Inc5Jetcutht2000";
+cutname[56]="RA2Inc5Jetcutht2500";
+cutname[57]="RA2Inc5Jetcutht1500mht700";
+cutname[58]="RA2Inc5Jetcutht2000mht800";
+cutname[59]="RA2Inc5Jetcutht2000mht1000";
+cutname[60]="RA2Inc5Jetcutht2500mht1000";
+cutname[61]="RA2Inc5Jetcutbtag2ht1500";
+cutname[62]="RA2Inc5Jetcutbtag2ht2000";
+cutname[63]="RA2Inc5Jetcutbtag2ht2500";
+cutname[64]="RA2Inc5Jetcutbtag2ht1500mht700";
+cutname[65]="RA2Inc5Jetcutbtag2ht2000mht800";
+cutname[66]="RA2Inc5Jetcutbtag2ht2000mht1000";
+cutname[67]="RA2Inc5Jetcutbtag2ht2500mht1000";
+
+cutname[68]="RA2Inc6Jetcutht1500";
+cutname[69]="RA2Inc6Jetcutht2000";
+cutname[70]="RA2Inc6Jetcutht2500";
+cutname[71]="RA2Inc6Jetcutht1500mht700";
+cutname[72]="RA2Inc6Jetcutht2000mht800";
+cutname[73]="RA2Inc6Jetcutht2000mht1000";
+cutname[74]="RA2Inc6Jetcutht2500mht1000";
+cutname[75]="RA2Inc6Jetcutbtag2ht1500";
+cutname[76]="RA2Inc6Jetcutbtag2ht2000";
+cutname[77]="RA2Inc6Jetcutbtag2ht2500";
+cutname[78]="RA2Inc6Jetcutbtag2ht1500mht700";
+cutname[79]="RA2Inc6Jetcutbtag2ht2000mht800";
+cutname[80]="RA2Inc6Jetcutbtag2ht2000mht1000";
+cutname[81]="RA2Inc6Jetcutbtag2ht2500mht1000";
+
+
 
      for(int i=0; i< cutname.size();i++){
       cut_histvec_map[cutname[i]]=vecTH;
@@ -579,8 +731,13 @@ eventType[4]="TThadronic";
 }
 else{//For all other types 
 eventType[0]="allEvents";
-eventType[1]="glgl";
-
+/*eventType[1]="glgl";
+eventType[2]="n2n2";
+eventType[3]="c1n2";
+eventType[4]="c1c1";
+eventType[5]="t1t1";
+eventType[6]="b1b1";
+*/
 }
 /*We don't need for example TTbar events when considering BJ. This only slows the code. So the following is commented out.
     eventType[0]="allEvents";
@@ -803,8 +960,6 @@ weight = dw.weight(isample, GenParticlevec);
           tauvec.push_back(jet);
         }
       }
-      //cout << " tauSize " << tauvec.size() << endl;
-      //if(tauvec.size()>0){cout << " tau->pt: " << tauvec[0]->PT << endl;}
 
       /*int genTaunum=0;
         for(int i = 0; i < (int)(GenParticlevec.size()); ++i){
@@ -813,6 +968,18 @@ weight = dw.weight(isample, GenParticlevec);
         }
         cout << "genTaunum: " << genTaunum << endl;
       */
+
+TLorentzVector vv;
+vecGenBottom.clear();
+// GenParticle bottom quark
+      for(int i = 0; i < (int)(GenParticlevec.size()); ++i){
+      GenParticle * p = &GenParticlevec.at(i);
+      if(fabs(p->PID)==5 && p->Status==3){
+        vv.SetPxPyPzE(p->Px,p->Py,p->Pz,p->E);
+        vecGenBottom.push_back(vv);
+      }
+      }
+
 
       ///making the values zero for each event
       totPx=0;
@@ -974,13 +1141,21 @@ double BtagTight2Eta=-1000;
 double BtagTight2Phi=-1000;
 if((int)vecBtagTight.size()>=1){BtagTight1pt=vecBtagTight[0].Pt();BtagTight1Eta=vecBtagTight[0].Eta();BtagTight1Phi=vecBtagTight[0].Phi();}
 if((int)vecBtagTight.size()>=2){BtagTight2pt=vecBtagTight[1].Pt();BtagTight2Eta=vecBtagTight[1].Eta();BtagTight2Phi=vecBtagTight[1].Phi();}
-
+double ptGenBottom1=-99., etaGenBottom1=-99.;
+if ((int)vecGenBottom.size()>0){ptGenBottom1=vecGenBottom[0].Pt();etaGenBottom1=vecGenBottom[0].Eta();}
+double ptGenBottom2=-99., etaGenBottom2=-99.;
+if ((int)vecGenBottom.size()>1){ptGenBottom2=vecGenBottom[1].Pt(); etaGenBottom2=vecGenBottom[1].Eta();}
 ///Important: here order is sensitive. The order must be the same as that of histograms in vecTH.
 double eveinfvec[] = {
 weight, 
 HT, 
 MHT, 
 vecjvec.size(),
+vecGenBottom.size(),
+ptGenBottom1,
+etaGenBottom1,
+ptGenBottom2,
+etaGenBottom2,
 vecBtagLoose.size(), 
 vecBtagTight.size(),
 BtagLoose1pt,
@@ -1020,12 +1195,81 @@ BtagTight2Phi
 
 	}//end of bg_type determination
       }//end of loop over all the different event types: "allEvents", "Wlv", "Zvv"
-      
+
+////////////////////////////////////////Determine different contributions to the signal, e.g., glgl, or t1t1, etc.
+int susyNum=0;
+int n_slepton = 0;
+int n_ewkino = 0;
+// in order to distinguish ewkino
+int n_ewkino_c1 = 0;
+int n_ewkino_c2 = 0;
+int n_ewkino_n1 = 0;
+int n_ewkino_n2 = 0;
+int n_ewkino_n3 = 0;
+int n_ewkino_n4 = 0;
+
+int n_gluino=0;
+int n_stop = 0;
+int n_sbottom = 0;
+int n_squark = 0;
+int n_other=0;
+
+if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
+
+//look for SUSY particles whose moms are not SUSY particles
+//these are the produced particles in the hard-scatter
+
+for(int i = 0 ; i < (int)(GenParticlevec.size()); i++){
+GenParticle * c =(GenParticle*) &GenParticlevec.at(i);
+/* In the sample we are working with the mother information is problematic. So the following wont work.
+if (c==0) continue; //try to prevent crashes....
+int pid = std::abs(c->PID);
+int momIndex1 = c->M1;
+if (momIndex1<0) continue;
+GenParticle * theMom = (GenParticle*) &GenParticlevec.at(momIndex1);
+if (theMom==0) continue; //saw momIndex1 be invalid once
+int momPid = std::abs(theMom->PID);
+if (isSusy(pid) && !isSusy(momPid)) {
+*/    
+int pid = std::abs(c->PID);
+if (isSusy(pid) && susyNum < 2) {
+susyNum++;
+    if(pid >= 1000001 && pid <= 1000004)n_squark++;
+    else if ( pid >= 2000001 && pid <= 2000004)n_squark++;
+    else if ( pid == 1000005 || pid==2000005)n_sbottom++;
+    else if ( pid == 1000006 || pid==2000006)n_stop++;
+    else if ( pid >= 1000011 && pid <= 1000016)n_slepton++;
+    else if ( pid >= 2000011 && pid <= 2000016)n_slepton++;
+    else if ( pid==1000021)n_gluino++;
+    else if ( pid>=1000022 && pid <= 1000037) {
+      // distinguish individual ewkinos
+      n_ewkino++;
+      if (pid==1000022) n_ewkino_n1++;
+      else if (pid==1000023) n_ewkino_n2++;
+      else if (pid==1000024) n_ewkino_c1++;
+      else if (pid==1000025) n_ewkino_n3++;
+      else if (pid==1000035) n_ewkino_n4++;
+      else if (pid==1000037) n_ewkino_c2++;
+    }//end of ewkino if
+    else n_other++;
+}//end of if isSusy
+}//end of for
+}//end of if 
+
+if(n_squark==2)sqsq++;
+else if(n_sbottom==2)sbsb++; 
+else if(n_stop==2)stst++;
+else if(n_slepton==2)slsl++;
+else if(n_gluino==2)glgl++;
+else if(n_ewkino==2)ewew++; 
+else if(n_gluino==1 && n_squark==1)glsq++;
+else othersusy++;
+/////////////////////////
+     
     }///End of loop over all Events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//
     //======================================================================
 
-    //
-    //fill the cut flow here
+   //fill the cut flow here
     //we generate one cut flow hist for each bg type. bins inside each histogram correspond to different cut names
     int nnn;
     for(map<string, map<string , vector<TH1D> > >::iterator itt=map_map.begin(); itt!=map_map.end();itt++){
@@ -1099,6 +1343,17 @@ BtagTight2Phi
     }
     file.close();
     input.close(); 
+
+//fill the "susy production mode" histogram  
+if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
+resFile->cd();
+TH1D susymode = TH1D("susymode","susy production mode", 8,0,8);
+susymode.Fill("Slepton Pair",slsl);susymode.Fill("Ewkino Pair",ewew);susymode.Fill("Stop Pair",stst);susymode.Fill("Sbottom Pair",sbsb);susymode.Fill("Gluino Pair",glgl);susymode.Fill("Gluino-Squark",glsq);susymode.Fill("Squark Pair",sqsq);susymode.Fill("Other",othersusy);
+susymode.Write("SusyMode");
+}//end of if
+ 
+
+
 
   }//end of the constructor
 };//end of class mainClass
