@@ -44,11 +44,11 @@ class histClass{
   double * a;
   TH1D * b_hist;
 public:
-  void fill(double * eveinfarr_, TH1D * hist_){
+  void fill(int Nhists, double * eveinfarr_, TH1D * hist_){
     a = eveinfarr_;
     b_hist=hist_;
     (*b_hist).Fill(*a);
-    for(int i=1; i<=22; i++){
+    for(int i=1; i<=Nhists; i++){
       (*(b_hist+i)).Fill(*(a+i),*a);
     }
   }
@@ -384,7 +384,7 @@ class mainClass{
 
   //List of variables
   int terminator, desirednumeve;
-  int stst,sqsq,sbsb,slsl,glgl,ewew,glsq,othersusy;
+  int Nhists;
   float xs, xserr;
   double weight, CrossSection, CrossSectionError, totPx, totPy, HT, MHT, cutHT, cutMHT, pt, coss, sinn;
   vector<vector<double> > vecjvec, vecelecvec, vecmuvec;
@@ -399,6 +399,8 @@ class mainClass{
   string pro, line, Pileup_ ;
   map<int, string> cutname;
   map<int, string> eventType;
+  map<string , int> susymap;
+  map<string, map<string , int> > map_cutname_susymap;
   fstream file, input, cutflowfile;
   map<string, TH1D> cutflowmap;
   map<string , vector<TH1D> > cut_histvec_map;  
@@ -546,7 +548,6 @@ public:
 mainClass(string Pileup, string Process, string Detector, string Outdir, string inputnumber){
 Pileup_ = Pileup;
 CrossSection=-999.0; CrossSectionError=0.0; totPx=0;desirednumeve=-999; totPy=0; HT=0; MHT=0; cutHT=0; cutMHT=0; pt=0; coss=0; sinn=0;
-stst=0;sqsq=0;sbsb=0;slsl=0;glgl=0;ewew=0;glsq=0;othersusy=0;
     /////Here you should determine howmany events you need. If you need all the events, please comment this out. 
 //      desirednumeve = 1000;
   
@@ -611,6 +612,7 @@ stst=0;sqsq=0;sbsb=0;slsl=0;glgl=0;ewew=0;glsq=0;othersusy=0;
       cutflowmap[itt->first]=cutflowhist;
     }
 
+Nhists=((int)(vecTH.size())-1);//-1 is because weight shouldn't be counted.
     //
     //initialize a map between string=cutnames and histvecs. copy one histvec into all of them. The histograms, though, will be filled differently.
     cutname[0]="RA2nocut";
@@ -776,10 +778,21 @@ eventType[6]="b1b1";
       histobjmap[it->first]=histObj;
     }
 
+//This shows howmany events contain squark-squark pair, etc.
+susymap["sqsq"]=0;susymap["stst"]=0;susymap["sbsb"]=0;susymap["slsl"]=0;susymap["glgl"]=0;susymap["glsq"]=0;susymap["ewew"]=0;susymap["others"]=0;
+
+//we need one susymap for each cut
+for(int i=0; i< cutname.size();i++){
+      map_cutname_susymap[cutname[i]]=susymap;
+    }
+
+
+
+
     //
     //Add the root files to a chain called Delphes
     sprintf(TreeList,"./FileList/%s/%s_%s_%s",Detector.c_str(),Process.c_str(),Pileup.c_str(),inputnumber.c_str());
-if(Process.find("_HT")!=string::npos || Process.find("StauC")!=string::npos){input.open(TreeList,std::fstream::in);}//use this when running on Background. 
+if(Process.find("_HT")!=string::npos || Process.find("StauC")!=string::npos || Process.find("FullExcept")!=string::npos){input.open(TreeList,std::fstream::in);}//use this when running on Background. 
 else{ if(!input.is_open()){sprintf(TreeList,"./FileList/%s/%s_%s.list",Detector.c_str(),Process.c_str(),Pileup.c_str());input.open(TreeList,std::fstream::in);}} ///use this line if running on signal or a file with *.list suffix.
     cout << "file name " << TreeList << endl; 
 //reset the chain before loading the TTrees    
@@ -871,6 +884,71 @@ GenParticlevec.clear();
           GenParticle * particle = (GenParticle*)branchParticle->At(i);
           GenParticlevec.push_back(*particle);
 	}//end of loop over "particles in history" 
+
+
+////////////////////////////////////////Determine different contributions to the signal, e.g., glgl, or t1t1, etc.
+int susyNum=0;
+int n_slepton = 0;
+int n_ewkino = 0;
+// in order to distinguish ewkino
+int n_ewkino_c1 = 0;
+int n_ewkino_c2 = 0;
+int n_ewkino_n1 = 0;
+int n_ewkino_n2 = 0;
+int n_ewkino_n3 = 0;
+int n_ewkino_n4 = 0;
+
+int n_gluino=0;
+int n_stop = 0;
+int n_sbottom = 0;
+int n_squark = 0;
+int n_other=0;
+
+if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
+
+//look for SUSY particles whose moms are not SUSY particles
+//these are the produced particles in the hard-scatter
+
+for(int i = 0 ; i < (int)(GenParticlevec.size()); i++){
+GenParticle * c =(GenParticle*) &GenParticlevec.at(i);
+/* In the sample we are working with the mother information is problematic. So the following wont work.
+if (c==0) continue; //try to prevent crashes....
+int pid = std::abs(c->PID);
+int momIndex1 = c->M1;
+if (momIndex1<0) continue;
+GenParticle * theMom = (GenParticle*) &GenParticlevec.at(momIndex1);
+if (theMom==0) continue; //saw momIndex1 be invalid once
+int momPid = std::abs(theMom->PID);
+if (isSusy(pid) && !isSusy(momPid)) {
+*/
+int pid = std::abs(c->PID);
+if (isSusy(pid) && susyNum < 2) {
+susyNum++;
+    if(pid >= 1000001 && pid <= 1000004)n_squark++;
+    else if ( pid >= 2000001 && pid <= 2000004)n_squark++;
+    else if ( pid == 1000005 || pid==2000005)n_sbottom++;
+    else if ( pid == 1000006 || pid==2000006)n_stop++;
+    else if ( pid >= 1000011 && pid <= 1000016)n_slepton++;
+    else if ( pid >= 2000011 && pid <= 2000016)n_slepton++;
+    else if ( pid==1000021)n_gluino++;
+    else if ( pid>=1000022 && pid <= 1000037) {
+      // distinguish individual ewkinos
+      n_ewkino++;
+      if (pid==1000022) n_ewkino_n1++;
+      else if (pid==1000023) n_ewkino_n2++;
+      else if (pid==1000024) n_ewkino_c1++;
+      else if (pid==1000025) n_ewkino_n3++;
+      else if (pid==1000035) n_ewkino_n4++;
+      else if (pid==1000037) n_ewkino_c2++;
+    }//end of ewkino if
+    else n_other++;
+}//end of if isSusy
+}//end of for
+}//end of if 
+
+/////////////////////////
+
+
 
 ///this is to calculate the weights
 int isample; // 1: TTbar, 2: BJ, 0: All other samples
@@ -1185,9 +1263,21 @@ BtagTight2Phi
 	  //Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts//Cuts
 
 	  //
-	  //loop over cut names and fill the histograms
+	  //loop over cut names and fill the histograms. Also, prepare the values for the "susy mode production".
 	  for(map<string , vector<TH1D> >::iterator ite=cut_histvec_map.begin(); ite!=cut_histvec_map.end();ite++){
-	    if(checkcut(ite->first)==true){histobjmap[ite->first].fill( &eveinfvec[0] ,&itt->second[ite->first][0]);}
+	    if(checkcut(ite->first)==true){
+            histobjmap[ite->first].fill(Nhists, &eveinfvec[0] ,&itt->second[ite->first][0]); 
+if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.             
+if(n_squark==2)map_cutname_susymap[ite->first]["sqsq"]++;
+else if(n_sbottom==2)map_cutname_susymap[ite->first]["sbsb"]++;
+else if(n_stop==2)map_cutname_susymap[ite->first]["stst"]++;
+else if(n_slepton==2)map_cutname_susymap[ite->first]["slsl"]++;
+else if(n_gluino==2)map_cutname_susymap[ite->first]["glgl"]++;
+else if(n_ewkino==2)map_cutname_susymap[ite->first]["ewew"]++;
+else if(n_gluino==1 && n_squark==1)map_cutname_susymap[ite->first]["glsq"]++;
+else map_cutname_susymap[ite->first]["others"]++;
+}///end of if Process.find
+            }///end of if checkcut
 	  }//end of loop over cut names
 	  
 	  //
@@ -1196,75 +1286,7 @@ BtagTight2Phi
 	}//end of bg_type determination
       }//end of loop over all the different event types: "allEvents", "Wlv", "Zvv"
 
-////////////////////////////////////////Determine different contributions to the signal, e.g., glgl, or t1t1, etc.
-int susyNum=0;
-int n_slepton = 0;
-int n_ewkino = 0;
-// in order to distinguish ewkino
-int n_ewkino_c1 = 0;
-int n_ewkino_c2 = 0;
-int n_ewkino_n1 = 0;
-int n_ewkino_n2 = 0;
-int n_ewkino_n3 = 0;
-int n_ewkino_n4 = 0;
 
-int n_gluino=0;
-int n_stop = 0;
-int n_sbottom = 0;
-int n_squark = 0;
-int n_other=0;
-
-if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
-
-//look for SUSY particles whose moms are not SUSY particles
-//these are the produced particles in the hard-scatter
-
-for(int i = 0 ; i < (int)(GenParticlevec.size()); i++){
-GenParticle * c =(GenParticle*) &GenParticlevec.at(i);
-/* In the sample we are working with the mother information is problematic. So the following wont work.
-if (c==0) continue; //try to prevent crashes....
-int pid = std::abs(c->PID);
-int momIndex1 = c->M1;
-if (momIndex1<0) continue;
-GenParticle * theMom = (GenParticle*) &GenParticlevec.at(momIndex1);
-if (theMom==0) continue; //saw momIndex1 be invalid once
-int momPid = std::abs(theMom->PID);
-if (isSusy(pid) && !isSusy(momPid)) {
-*/    
-int pid = std::abs(c->PID);
-if (isSusy(pid) && susyNum < 2) {
-susyNum++;
-    if(pid >= 1000001 && pid <= 1000004)n_squark++;
-    else if ( pid >= 2000001 && pid <= 2000004)n_squark++;
-    else if ( pid == 1000005 || pid==2000005)n_sbottom++;
-    else if ( pid == 1000006 || pid==2000006)n_stop++;
-    else if ( pid >= 1000011 && pid <= 1000016)n_slepton++;
-    else if ( pid >= 2000011 && pid <= 2000016)n_slepton++;
-    else if ( pid==1000021)n_gluino++;
-    else if ( pid>=1000022 && pid <= 1000037) {
-      // distinguish individual ewkinos
-      n_ewkino++;
-      if (pid==1000022) n_ewkino_n1++;
-      else if (pid==1000023) n_ewkino_n2++;
-      else if (pid==1000024) n_ewkino_c1++;
-      else if (pid==1000025) n_ewkino_n3++;
-      else if (pid==1000035) n_ewkino_n4++;
-      else if (pid==1000037) n_ewkino_c2++;
-    }//end of ewkino if
-    else n_other++;
-}//end of if isSusy
-}//end of for
-}//end of if 
-
-if(n_squark==2)sqsq++;
-else if(n_sbottom==2)sbsb++; 
-else if(n_stop==2)stst++;
-else if(n_slepton==2)slsl++;
-else if(n_gluino==2)glgl++;
-else if(n_ewkino==2)ewew++; 
-else if(n_gluino==1 && n_squark==1)glsq++;
-else othersusy++;
-/////////////////////////
      
     }///End of loop over all Events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//end of loop over events//
     //======================================================================
@@ -1324,7 +1346,13 @@ else othersusy++;
 	//std::cout << (it->first).c_str() << std::endl;
 	cdtoit =  cdtoitt->mkdir((it->first).c_str());
 	cdtoit->cd();
-
+//////////////susymode histogram
+if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
+          TH1D susymode = TH1D("susymode","susy production mode", 8,0,8);
+          susymode.Fill("Slepton Pair",map_cutname_susymap[it->first]["slsl"]);susymode.Fill("Ewkino Pair",map_cutname_susymap[it->first]["ewew"]);susymode.Fill("Stop Pair",map_cutname_susymap[it->first]["stst"]);susymode.Fill("Sbottom Pair",map_cutname_susymap[it->first]["sbsb"]);susymode.Fill("Gluino Pair",map_cutname_susymap[it->first]["glgl"]);susymode.Fill("Gluino-Squark",map_cutname_susymap[it->first]["glsq"]);susymode.Fill("Squark Pair",map_cutname_susymap[it->first]["sqsq"]);susymode.Fill("Other",map_cutname_susymap[it->first]["others"]);
+susymode.Write("SusyMode");
+}//end of if Process.find
+/////////////
 	int nHist = it->second.size();
 	//KH for(int i=0; i<=3; i++){//since we only have 4 type of histograms 
 	for(int i=0; i<nHist; i++){//since we only have 4 type of histograms 
@@ -1345,12 +1373,12 @@ else othersusy++;
     input.close(); 
 
 //fill the "susy production mode" histogram  
-if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
-resFile->cd();
-TH1D susymode = TH1D("susymode","susy production mode", 8,0,8);
-susymode.Fill("Slepton Pair",slsl);susymode.Fill("Ewkino Pair",ewew);susymode.Fill("Stop Pair",stst);susymode.Fill("Sbottom Pair",sbsb);susymode.Fill("Gluino Pair",glgl);susymode.Fill("Gluino-Squark",glsq);susymode.Fill("Squark Pair",sqsq);susymode.Fill("Other",othersusy);
-susymode.Write("SusyMode");
-}//end of if
+//if(Process.find("TT")==string::npos && Process.find("BJ")==string::npos){//This is related to signal. We don't need to slow down the code in background analysis.
+//resFile->cd();
+//TH1D susymode = TH1D("susymode","susy production mode", 8,0,8);
+//susymode.Fill("Slepton Pair",slsl);susymode.Fill("Ewkino Pair",ewew);susymode.Fill("Stop Pair",stst);susymode.Fill("Sbottom Pair",sbsb);susymode.Fill("Gluino Pair",glgl);susymode.Fill("Gluino-Squark",glsq);susymode.Fill("Squark Pair",sqsq);susymode.Fill("Other",othersusy);
+//susymode.Write("SusyMode");
+//}//end of if
  
 
 
