@@ -40,11 +40,12 @@ TDirectory *cdtoit;
 
 
 public:
-mainClass(){//constructor
+mainClass(int luminosity){//constructor
 //Importnat
 //make sure this initialization of the 
 //maps is the same as that in main.cpp
  
+cout << "hello " << endl;
 
     cutname[0]="RA2nocut";
     cutname[1]="RA2Asys";
@@ -226,7 +227,6 @@ Sig_inputfilevec.push_back(TFile::Open(tempname,"R"));
 //sprintf(tempname,"PhaseII4_Stop_CharmLSPv4_14TEV_140PileUp.root");
 //sprintf(tempname,"results_PhaseII4_FullExceptStopv4_14TEV_140PileUp.root");
 sprintf(tempname,"results_PhaseII4_StauC_14TEV_140PileUp.root");
-
 file = new TFile(tempname,"RECREATE"); 
 cdtoitt = file->mkdir("allEvents");
 cdtoitt->cd();
@@ -237,17 +237,13 @@ cdtoitt->cd();
 if(i==0 && j==0){cdtoit =  cdtoitt->mkdir((it->second).c_str());cdtoit->cd();}
 else{sprintf(tempname,"allEvents/%s",(it->second).c_str());file->cd(tempname);}
 
-sprintf(tempname,"allEvents/%s/%s_%s_allEvents",(it->second).c_str(),(histname[j]).c_str(),(it->second).c_str());
-other_hist = (TH1D *) Sig_inputfilevec.at(i)->Get(tempname)->Clone();
 for(map<int , string >::iterator itt=sigtype.begin(); itt!=sigtype.end();itt++){        // loop over different event types
 
 sprintf(tempname,"%s/%s/%s_%s_%s",(itt->second).c_str(),(it->second).c_str(),(histname[j]).c_str(),(it->second).c_str(),(itt->second).c_str());
 temphist = (TH1D *) Sig_inputfilevec.at(i)->Get(tempname)->Clone();
-other_hist->Add(temphist,-1);
-if(itt->second=="glgl"){final_hist=temphist;final_hist->Add(temphist,(1-kfactor["glgl"]));}
+if(itt->second=="glgl"){final_hist=temphist;final_hist->Add(temphist,(1.0-kfactor["glgl"]));}
 else{final_hist->Add(temphist,kfactor[itt->second]);}
                }//end of loop over event types
-final_hist->Add(other_hist,1);
         sprintf(tempname,"%s_%s_allEvents",histname[j].c_str(),(it->second).c_str());
         final_hist->Write(tempname);
       }//end of loop over HT Bins. Here, no loop.
@@ -260,7 +256,7 @@ file->Close();
 
 
 int main(){
-mainClass mainObj();
+mainClass mainObj(3000000);
 cout << " done :) " << endl;
 }
 
